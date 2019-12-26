@@ -23,9 +23,24 @@ Base.@kwdef mutable struct Agent{P<:AbstractPolicy, B<:AbstractTrajectory, R} <:
     role::R = DEFAULT_PLAYER
 end
 
-function (agent::Agent)(obs)
+function (agent::Agent)(::PreEpisodeStage, obs)
     action = agent.π(obs)
-    push!(agent.buffer, obs => action)
+    push!(agent.buffer; state=get_state(obs), action=action)
     update!(agent.π, agent.buffer)
     action
+end
+
+function (agent::Agent)(::PreActStage, obs)
+    action = agent.π(obs)
+    push!(agent.buffer; reward=get_reward(obs), terminal=is_terminal(obs), next_state=get_state(obs), next_action=action)
+    update!(agent.π, agent.buffer)
+    action
+end
+
+(agent::Agent)(::PostActStage, obs) = nothing
+
+function (agent::Agent)(::PostEpisodeStage, obs)
+    push!(agent.buffer; reward=get_reward(obs), terminal=is_terminal(obs), next_state=get_state(obs), next_action=agent.π(obs))
+    update!(agent.π, agent.buffer)
+    nothing
 end

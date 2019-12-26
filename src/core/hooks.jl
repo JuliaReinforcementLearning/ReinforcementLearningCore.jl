@@ -1,13 +1,4 @@
-export AbstractStage,
-       PreEpisodeStage,
-       PRE_EPISODE_STAGE,
-       PostEpisodeStage,
-       POST_EPISODE_STAGE,
-       PreActStage,
-       PRE_ACT_STAGE,
-       PostActStage,
-       POST_ACT_STAGE,
-       AbstractHook,
+export AbstractHook,
        ComposedHook,
        EmptyHook,
        StepsPerEpisode,
@@ -15,18 +6,6 @@ export AbstractStage,
        TotalRewardPerEpisode,
        CumulativeReward,
        TimePerStep
-
-abstract type AbstractStage end
-
-struct PreEpisodeStage <: AbstractStage end
-struct PostEpisodeStage <: AbstractStage end
-struct PreActStage <: AbstractStage end
-struct PostActStage <: AbstractStage end
-
-const PRE_EPISODE_STAGE = PreEpisodeStage()
-const POST_EPISODE_STAGE = PostEpisodeStage()
-const PRE_ACT_STAGE = PreActStage()
-const POST_ACT_STAGE = PostActStage()
 
 """
 A hook is called at different stage duiring a [`run`](@ref) to allow users to inject customized runtime logic.

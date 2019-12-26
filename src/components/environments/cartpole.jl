@@ -16,6 +16,8 @@ struct CartPoleEnvParams{T}
     max_steps::Int
 end
 
+Base.show(io::IO, params::CartPoleEnvParams) = print(io, join(["$p=$(getfield(params, p))" for p in fieldnames(CartPoleEnvParams)], ","))
+
 mutable struct CartPoleEnv{T,R<:AbstractRNG} <: AbstractEnv
     params::CartPoleEnvParams{T}
     action_space::DiscreteSpace{Int64}
@@ -26,6 +28,8 @@ mutable struct CartPoleEnv{T,R<:AbstractRNG} <: AbstractEnv
     t::Int
     rng::R
 end
+
+Base.show(io::IO, env::CartPoleEnv{T}) where T = print(io, "CartPoleEnv{$T}($(env.params))")
 
 function CartPoleEnv(
     ;
@@ -65,6 +69,8 @@ function CartPoleEnv(
     reset!(cp)
     cp
 end
+
+CartPoleEnv{T}(;kwargs...) where T = CartPoleEnv(;T=T, kwargs...)
 
 function RLBase.reset!(env::CartPoleEnv{T}) where {T<:Number}
     env.state[:] = T(.1) * rand(env.rng, T, 4) .- T(.05)

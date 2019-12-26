@@ -1,9 +1,9 @@
 @testset "trajectories" begin
 
 @testset "VectorBuffer" begin
-    b = VectorBuffer(
-        :state => Vector{Int},
-        :reward => Float64
+    b = VectorBuffer(;
+        state = Vector{Int},
+        reward = Float64
     )
 
     @test length(b) == 0
