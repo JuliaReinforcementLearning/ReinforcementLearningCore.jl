@@ -1,25 +1,5 @@
 @testset "explorers" begin
 
-@testset "AlternateExplorer" begin
-    explorer = AlternateExplorer(;n=3)
-    @test get_distribution(explorer, nothing) == [1, 0, 0]
-
-    # make sure that `get_distribution` has no side-effect
-    @test get_distribution(explorer, nothing) == [1, 0, 0]
-    @test get_distribution(explorer, nothing) == [1, 0, 0]
-
-    @test [explorer(nothing) for _ in 1:9] == repeat([1, 2, 3], 3)
-
-    @test explorer(nothing) == 1
-    @test explorer(nothing) == 2
-    @test get_distribution(explorer, nothing) == [0, 0, 1]
-    @test explorer(nothing) == 3
-
-    reset!(explorer)
-    @test get_distribution(explorer, nothing) == [1, 0, 0]
-    @test explorer(nothing) == 1
-end
-
 @testset "EpsilonGreedyExplorer" begin
     @testset "API" begin
         explorer = EpsilonGreedyExplorer(0.1)
