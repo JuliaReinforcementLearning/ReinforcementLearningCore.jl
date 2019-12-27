@@ -1,35 +1,36 @@
 export EpisodeCompactSARTSABuffer
 
-const EpisodeCompactSARTSABuffer = Trajectory{SARTSA, T1, NamedTuple{RTSA, T2}} where {T1, T2<:Tuple{Vararg{<:Vector}}}
+const EpisodeCompactSARTSABuffer = Trajectory{SARTSA, T1, NamedTuple{RTSA, T2}, Val{:episodic}} where {T1, T2<:Tuple{Vararg{<:Vector}}}
 
 function EpisodeCompactSARTSABuffer(;
-    state_eltype = Int,
-    action_eltype = Int,
-    reward_eltype = Float32,
-    terminal_eltype = Bool,
+    state_type = Int,
+    action_type = Int,
+    reward_type = Float32,
+    terminal_type = Bool,
 )
     EpisodeCompactSARTSABuffer{
         Tuple{
-            state_eltype,
-            action_eltype,
-            reward_eltype,
-            terminal_eltype,
-            state_eltype,
-            action_eltype,
+            state_type,
+            action_type,
+            reward_type,
+            terminal_type,
+            state_type,
+            action_type,
         },
         Tuple{
-            Vector{reward_eltype},
-            Vector{terminal_eltype},
-            Vector{state_eltype},
-            Vector{action_eltype},
+            Vector{reward_type},
+            Vector{terminal_type},
+            Vector{state_type},
+            Vector{action_type},
         }
     }(
         (
-            reward=Vector{reward_eltype}(),
-            terminal = Vector{terminal_eltype}(),
-            state=Vector{state_eltype}(),
-            action=Vector{action_eltype}()
-        )
+            reward=Vector{reward_type}(),
+            terminal = Vector{terminal_type}(),
+            state=Vector{state_type}(),
+            action=Vector{action_type}()
+        ),
+        Val(:episodic)
     )
 end
 

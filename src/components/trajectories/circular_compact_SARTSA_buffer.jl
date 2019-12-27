@@ -4,37 +4,37 @@ const CircularCompactSARTSABuffer = Trajectory{SARTSA, T1, NamedTuple{RTSA, T2}}
 
 function CircularCompactSARTSABuffer(;
     capacity,
-    state_eltype = Int,
+    state_type = Int,
     state_size = (),
-    action_eltype = Int,
+    action_type = Int,
     action_size = (),
-    reward_eltype = Float64,
+    reward_type = Float64,
     reward_size = (),
-    terminal_eltype = Bool,
+    terminal_type = Bool,
     terminal_size = (),
 )
     capacity > 0 || throw(ArgumentError("capacity must > 0"))
     CircularCompactSARTSABuffer{ 
         Tuple{
-            state_eltype,
-            action_eltype,
-            reward_eltype,
-            terminal_eltype,
-            state_eltype,
-            action_eltype
+            state_type,
+            action_type,
+            reward_type,
+            terminal_type,
+            state_type,
+            action_type
         },
         Tuple{
-            CircularArrayBuffer{reward_eltype, length(reward_size)+1},
-            CircularArrayBuffer{terminal_eltype, length(terminal_size)+1},
-            CircularArrayBuffer{state_eltype, length(state_size)+1},
-            CircularArrayBuffer{action_eltype, length(action_size)+1}
+            CircularArrayBuffer{reward_type, length(reward_size)+1},
+            CircularArrayBuffer{terminal_type, length(terminal_size)+1},
+            CircularArrayBuffer{state_type, length(state_size)+1},
+            CircularArrayBuffer{action_type, length(action_size)+1}
         }
     }(
         (
-            reward = CircularArrayBuffer{reward_eltype}(reward_size..., capacity),
-            terminal = CircularArrayBuffer{terminal_eltype}(terminal_size..., capacity),
-            state = CircularArrayBuffer{state_eltype}(state_size..., capacity+1),
-            action = CircularArrayBuffer{action_eltype}(action_size..., capacity+1)
+            reward = CircularArrayBuffer{reward_type}(reward_size..., capacity),
+            terminal = CircularArrayBuffer{terminal_type}(terminal_size..., capacity),
+            state = CircularArrayBuffer{state_type}(state_size..., capacity+1),
+            action = CircularArrayBuffer{action_type}(action_size..., capacity+1)
         )
     )
 end

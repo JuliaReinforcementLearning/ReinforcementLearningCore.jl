@@ -1,7 +1,8 @@
 export Trajectory
 
-struct Trajectory{names,types,Tbs} <: AbstractTrajectory{names,types}
+struct Trajectory{names,types,Tbs, M} <: AbstractTrajectory{names,types}
     buffers::Tbs
+    meta::M
 end
 
 "A helper function to access inner fields"

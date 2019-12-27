@@ -17,3 +17,5 @@ RandomPolicy(env::AbstractEnv; seed=nothing) = RandomPolicy(;action_space = get_
 
 (p::RandomPolicy)(::FullActionSet, obs) = rand(p.rng, get_legal_actions(obs))
 (p::RandomPolicy)(::MinimalActionSet, obs) = rand(p.rng, p.action_space)
+
+RLBase.update!(p::RandomPolicy, experience) = nothing
