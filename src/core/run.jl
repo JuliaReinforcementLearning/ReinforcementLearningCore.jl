@@ -1,6 +1,6 @@
 import Base: run
 
-run(agent::AbstractAgent, env::AbstractEnv, stop_condition, hook::AbstractHook=EmptyHook()) = run(DynamicStyle(agent), agent, env, stop_condition, hook)
+run(agent::AbstractAgent, env::AbstractEnv, stop_condition=StopWhenDone(), hook::AbstractHook=EmptyHook()) = run(DynamicStyle(env), agent, env, stop_condition, hook)
 
 function run(::Sequential, agent::AbstractAgent, env::AbstractEnv, stop_condition, hook::AbstractHook)
 
@@ -34,4 +34,5 @@ function run(::Sequential, agent::AbstractAgent, env::AbstractEnv, stop_conditio
     end
     # !!! allow the agent to see the last observation, please!
     agent(PRE_ACT_STAGE, obs)
+    hook
 end
