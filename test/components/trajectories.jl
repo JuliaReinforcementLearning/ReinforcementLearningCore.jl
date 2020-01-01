@@ -41,6 +41,22 @@
     @test isfull(b) == false
 end
 
+@testset "VectorCompactSARTSABuffer" begin
+    b = VectorCompactSARTSABuffer()
+
+    @test length(b) == 0
+    @test size(b) == (0,)
+    @test isempty(b) == true
+    @test isfull(b) == false
+
+    t1 = (state=1, action=2)
+    push!(b;t1...)
+    t2 = (reward=1.0, terminal=false, next_state=2, next_action=3)
+    push!(b; t2...)
+
+    @test length(b) == 1
+end
+
 @testset "EpisodeCompactSARTSABuffer" begin
     b = EpisodeCompactSARTSABuffer()
 

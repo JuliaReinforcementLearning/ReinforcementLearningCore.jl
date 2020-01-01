@@ -1,9 +1,9 @@
-export CloneStateProcessor
+export CloneStatePreprocessor
 
 #####
-# CloneStateProcessor
+# CloneStatePreprocessor
 #####
 
-struct CloneStateProcessor <: AbstractPreprocessor end
+struct CloneStatePreprocessor <: AbstractPreprocessor end
 
-(p::CloneStateProcessor)(obs) = StateOverriddenObs(obs, deepcopy(get_state(obs)))
+(p::CloneStatePreprocessor)(obs) = StateOverriddenObs(obs, deepcopy(get_state(obs)))

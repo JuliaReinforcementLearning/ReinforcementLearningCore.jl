@@ -65,13 +65,6 @@ function Base.push!(cb::CircularArrayBuffer, data)
     cb
 end
 
-"""
-!!! note
-    When `push!`` a CircularArrayBuffer into a CircularArrayBuffer,
-    only the last frame of the former is pushed!
-"""
-Base.push!(cb::CircularArrayBuffer{T, N}, data::CircularArrayBuffer{T, N}) where {T, N} = push!(cb, select_last_frame(data))
-
 function Base.push!(cb::CircularArrayBuffer{T, N}, ::Missing) where {T, N}
     if cb.length == capacity(cb)
         cb.first = (cb.first == capacity(cb) ? 1 : cb.first + 1)
@@ -79,6 +72,16 @@ function Base.push!(cb::CircularArrayBuffer{T, N}, ::Missing) where {T, N}
         cb.length += 1
     end
     cb
+end
+
+function Base.pop!(cb::CircularArrayBuffer)
+    res = select_last_frame(cb)
+    if cb.length <= 0
+        throw(ArgumentError("buffer must be non-empty"))
+    else
+        cb.length -= 1
+    end
+    res
 end
 
 # #####

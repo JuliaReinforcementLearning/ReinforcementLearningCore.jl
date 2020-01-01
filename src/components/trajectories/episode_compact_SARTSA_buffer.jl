@@ -55,15 +55,21 @@ end
 
 Base.isempty(b::EpisodeCompactSARTSABuffer) = all(isempty(b[s]) for s in RTSA)
 
-function Base.push!(b::EpisodeCompactSARTSABuffer; state=nothing, action=nothing, reward=nothing, terminal=nothing, next_state=nothing, next_action=nothing)
-    if isfull(b)
-        empty!(b)
-    end
-    isnothing(state) || push!(b[:state], state)
-    isnothing(action) || push!(b[:action], action)
-    isnothing(reward) || push!(b[:reward], reward)
-    isnothing(terminal) || push!(b[:terminal], terminal)
-    isnothing(next_state) || push!(b[:state], next_state)
-    isnothing(next_action) || push!(b[:action], next_action)
+Base.push!(b::EpisodeCompactSARTSABuffer; state=nothing, action=nothing, reward=nothing, terminal=nothing) = push!(b, state, action, reward, terminal)
+
+function Base.push!(b::EpisodeCompactSARTSABuffer, s, a, ::Nothing, ::Nothing)
+    push!(b[:state], s)
+    push!(b[:action], a)
     b
+end
+
+function Base.push!(b::EpisodeCompactSARTSABuffer, ::Nothing, ::Nothing, r, t)
+    push!(b[:reward], r)
+    push!(b[:terminal], t)
+    b
+end
+
+function Base.pop!(b::CircularCompactSARTSABuffer, ::Val{:state}, ::Val{:action})
+    pop!(b[:state])
+    pop!(b[:action])
 end

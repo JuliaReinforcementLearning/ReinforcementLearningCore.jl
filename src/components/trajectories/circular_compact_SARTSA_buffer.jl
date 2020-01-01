@@ -1,6 +1,6 @@
 export CircularCompactSARTSABuffer
 
-const CircularCompactSARTSABuffer = Trajectory{SARTSA, T1, NamedTuple{RTSA, T2}} where {T1, T2<:Tuple{Vararg{<:CircularArrayBuffer}}}
+const CircularCompactSARTSABuffer = Trajectory{SARTSA, T1, NamedTuple{RTSA, T2}, Val{:circular}} where {T1, T2<:Tuple{Vararg{<:CircularArrayBuffer}}}
 
 function CircularCompactSARTSABuffer(;
     capacity,
@@ -35,7 +35,8 @@ function CircularCompactSARTSABuffer(;
             terminal = CircularArrayBuffer{terminal_type}(terminal_size..., capacity),
             state = CircularArrayBuffer{state_type}(state_size..., capacity+1),
             action = CircularArrayBuffer{action_type}(action_size..., capacity+1)
-        )
+        ),
+        Val(:circular)
     )
 end
 
@@ -70,27 +71,21 @@ function Base.empty!(b::CircularCompactSARTSABuffer)
     b
 end
 
-function Base.push!(b::CircularCompactSARTSABuffer; state=nothing, action=nothing, reward=nothing, terminal=nothing, next_state=nothing, next_action=nothing)
-    push!(b, state, action, reward, terminal, next_state, next_action)
-end
+Base.push!(b::CircularCompactSARTSABuffer; state=nothing, action=nothing, reward=nothing, terminal=nothing) = push!(b, state, action, reward, terminal)
 
-function Base.push!(b::CircularCompactSARTSABuffer, s, a, ::Nothing, ::Nothing, ::Nothing, ::Nothing)
-    if length(b) == 0
-        push!(b[:state], s)
-        push!(b[:action], a)
-    else
-        # @assert b[:terminal] "only reset state and action at the start of a new episode!"
-        update!(b[:state], s)
-        update!(b[:action], a)
-    end
+function Base.push!(b::CircularCompactSARTSABuffer, s, a, ::Nothing, ::Nothing)
+    push!(b[:state], s)
+    push!(b[:action], a)
     b
 end
 
-function Base.push!(b::CircularCompactSARTSABuffer, ::Nothing, ::Nothing, r, t, s′, a′)
-    # @assert length(b) > 0 && !b[:terminal] "shouldn't be called at the start of an episode"
+function Base.push!(b::CircularCompactSARTSABuffer, ::Nothing, ::Nothing, r, t)
     push!(b[:reward], r)
     push!(b[:terminal], t)
-    push!(b[:state], s′)
-    push!(b[:action], a′)
     b
+end
+
+function Base.pop!(b::CircularCompactSARTSABuffer, ::Val{:state}, ::Val{:action})
+    pop!(b[:state])
+    pop!(b[:action])
 end

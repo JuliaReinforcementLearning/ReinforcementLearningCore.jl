@@ -62,6 +62,30 @@
         @test length(b) == 3
         @test size(b) == (3,)
         @test b[[1, 2, 3]] == [7, 8, 9]
+
+        update!(b, 0)
+        @test length(b) == 3
+        @test b[[1, 2, 3]] == [7, 8, 0]
+
+        update!(b, 1)
+        @test length(b) == 3
+        @test b[[1, 2, 3]] == [7, 8, 1]
+
+        x = pop!(b)
+        @test x == 1
+        @test length(b) == 2
+        @test b[[1, 2]] == [7, 8]
+
+        x = pop!(b)
+        @test x == 8
+        @test length(b) == 1
+        @test b[1] == 7
+
+        x = pop!(b)
+        @test x == 7
+        @test length(b) == 0
+
+        @test_throws ArgumentError pop!(b)
     end
 
     @testset "2D Float64" begin
