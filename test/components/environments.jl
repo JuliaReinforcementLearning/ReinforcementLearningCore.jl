@@ -12,7 +12,7 @@ for env in [
     obs = observe(env)
 
     for _ in 1:1000
-        if is_terminal(obs)
+        if get_terminal(obs)
             reset!(env)
             obs = observe(env)
         end

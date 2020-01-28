@@ -12,11 +12,15 @@ consecutive_view(cb::AbstractArray, inds::Vector{Int}, n_stack::Int, n_horizeon:
 
 """
     find_all_max(A::AbstractArray)
+
 Like `findmax`, but all the indices of the maximum value are returned.
+
 !!! warning
     All elements of value `NaN` in `A` will be ignored, unless all elements are `NaN`.
     In that case, the returned maximum value will be `NaN` and the returned indices will be `collect(1:length(A))`
-#Examples
+
+# Examples
+
 ```julia-repl
 julia> find_all_max([-Inf, -Inf, -Inf])
 (-Inf, [1, 2, 3])
@@ -49,6 +53,11 @@ function find_all_max(A)
     end
 end
 
+"""
+    find_all_max(A, mask)
+
+Similar to `find_all_max(A)`, but only the masked elements in `A` will be considered.
+"""
 function find_all_max(A, mask)
     maxval = typemin(eltype(A))
     idxs = Int[]

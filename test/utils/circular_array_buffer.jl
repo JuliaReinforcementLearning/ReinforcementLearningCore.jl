@@ -8,6 +8,7 @@
         @test isfull(b) == false
         @test isempty(b) == true
         @test length(b) == 0
+        @test nframes(b) == 0
         @test size(b) == (0,)
         # element must has the exact same length with the element of buffer
         @test_throws DimensionMismatch push!(b, [1, 2])
@@ -19,6 +20,7 @@
         @test capacity(b) == 3
         @test isfull(b) == true
         @test length(b) == 3
+        @test nframes(b) == 3
         @test size(b) == (3,)
         @test b[1] == 1
         @test b[end] == 3
@@ -30,6 +32,7 @@
 
         @test capacity(b) == 3
         @test length(b) == 3
+        @test nframes(b) == 3
         @test size(b) == (3,)
         @test b[1] == 3
         @test b[end] == 5
@@ -39,12 +42,14 @@
         @test isfull(b) == false
         @test isempty(b) == true
         @test length(b) == 0
+        @test nframes(b) == 0
         @test size(b) == (0,)
 
         push!(b, 6)
         @test isfull(b) == false
         @test isempty(b) == false
         @test length(b) == 1
+        @test nframes(b) == 1
         @test size(b) == (1,)
         @test b[1] == 6
 
@@ -53,6 +58,7 @@
         @test isfull(b) == true
         @test isempty(b) == false
         @test length(b) == 3
+        @test nframes(b) == 3
         @test size(b) == (3,)
         @test b[[1, 2, 3]] == [6, 7, 8]
 
@@ -60,6 +66,7 @@
         @test isfull(b) == true
         @test isempty(b) == false
         @test length(b) == 3
+        @test nframes(b) == 3
         @test size(b) == (3,)
         @test b[[1, 2, 3]] == [7, 8, 9]
     end
@@ -71,6 +78,7 @@
         @test capacity(b) == 3
         @test isfull(b) == false
         @test length(b) == 0
+        @test nframes(b) == 0
         @test size(b) == (2, 2, 0)
 
         for x = 1:3
@@ -79,6 +87,7 @@
 
         @test capacity(b) == 3
         @test isfull(b) == true
+        @test nframes(b) == 3
         @test length(b) == 2 * 2 * 3
         @test size(b) == (2, 2, 3)
         for i = 1:3
@@ -92,6 +101,7 @@
 
         @test capacity(b) == 3
         @test length(b) == 2 * 2 * 3
+        @test nframes(b) == 3
         @test size(b) == (2, 2, 3)
         @test b[:, :, 1] == 3 * A
         @test b[:, :, end] == 5 * A
