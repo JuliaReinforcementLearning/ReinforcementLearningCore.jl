@@ -1,11 +1,12 @@
 import Base: run
 
-run(agent::AbstractAgent, env::AbstractEnv, stop_condition, hook::AbstractHook=EmptyHook()) = run(DynamicStyle(agent), agent, env, stop_condition, hook)
+run(agent::AbstractAgent, env::AbstractEnv, stop_condition=StopWhenDone(), hook::AbstractHook=EmptyHook()) = run(DynamicStyle(env), agent, env, stop_condition, hook)
 
 function run(::Sequential, agent::AbstractAgent, env::AbstractEnv, stop_condition, hook::AbstractHook)
 
     reset!(env)
     obs = observe(env)
+    agent(PRE_EPISODE_STAGE, obs)
     hook(PRE_EPISODE_STAGE, agent, env, obs)
     action = agent(PRE_EPISODE_STAGE, obs)
     hook(PRE_ACT_STAGE, agent, env, obs, action)
@@ -22,6 +23,7 @@ function run(::Sequential, agent::AbstractAgent, env::AbstractEnv, stop_conditio
 
             reset!(env)
             obs = observe(env)
+            agent(PRE_EPISODE_STAGE, obs)
             hook(PRE_EPISODE_STAGE, agent, env, obs)
             action = agent(PRE_EPISODE_STAGE, obs)
             hook(PRE_ACT_STAGE, agent, env, obs, action)
@@ -31,4 +33,5 @@ function run(::Sequential, agent::AbstractAgent, env::AbstractEnv, stop_conditio
             hook(PRE_ACT_STAGE, agent, env, obs, action)
         end
     end
+    hook
 end

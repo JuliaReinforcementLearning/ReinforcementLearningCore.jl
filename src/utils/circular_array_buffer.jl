@@ -125,7 +125,7 @@ Base.getindex(cb::CircularArrayBuffer{T, N}, i::Int) where {T, N} = getindex(cb.
 Base.setindex!(cb::CircularArrayBuffer{T, N}, v, i::Int) where {T, N} = setindex!(cb.buffer, v, _buffer_index(cb, i))
 capacity(cb::CircularArrayBuffer{T, N}) where {T, N} = size(cb.buffer, N)
 nframes(cb::CircularArrayBuffer) = cb.length
-RLBase.isfull(cb::CircularArrayBuffer) = cb.length == capacity(cb)
+isfull(cb::CircularArrayBuffer) = cb.length == capacity(cb)
 Base.isempty(cb::CircularArrayBuffer) = cb.length == 0
 
 @inline function _buffer_index(cb::CircularArrayBuffer, i::Int)
@@ -184,6 +184,16 @@ function Base.push!(cb::CircularArrayBuffer{T, N}, ::Missing) where {T, N}
         cb.length += 1
     end
     cb
+end
+
+function Base.pop!(cb::CircularArrayBuffer)
+    res = select_last_frame(cb)
+    if cb.length <= 0
+        throw(ArgumentError("buffer must be non-empty"))
+    else
+        cb.length -= 1
+    end
+    res
 end
 
 # #####

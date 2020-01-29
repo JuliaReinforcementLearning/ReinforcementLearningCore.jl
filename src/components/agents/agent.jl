@@ -8,24 +8,40 @@ One of the most commonly used [`AbstractAgent`](@ref).
 Generally speaking, it does nothing but
 
 1. Pass observation to the policy to generate an action
-1. Update the buffer using the `observation => action` pair
-1. Update the policy with the newly updated buffer
+1. Update the trajectory using the `observation => action` pair
+1. Update the policy with the newly updated trajectory
 
 # Keywords & Fields
 
-- `π`::[`AbstractPolicy`](@ref): the policy to use
-- `buffer`::[`AbstractTrajectory`](@ref): used to store transitions between agent and environment
-- `role=:DEFAULT`: used to distinguish different agents
+- `policy`::[`AbstractPolicy`](@ref): the policy to use
+- `trajectory`::[`AbstractTrajectory`](@ref): used to store transitions between agent and environment
+- `role=DEFAULT_PLAYER`: used to distinguish different agents
 """
 Base.@kwdef mutable struct Agent{P<:AbstractPolicy, B<:AbstractTrajectory, R} <: AbstractAgent
-    π::P
-    buffer::B
+    policy::P
+    trajectory::B
     role::R = DEFAULT_PLAYER
 end
 
-function (agent::Agent)(obs)
-    action = agent.π(obs)
-    push!(agent.buffer, obs => action)
-    update!(agent.π, agent.buffer)
+function (agent::Agent)(stage::AbstractStage, obs)
+    update!(stage, agent.trajectory, obs)
+end
+
+function (agent::Agent)(stage::PreActStage, obs)
+    action = agent.policy(obs)
+    update!(stage, agent.trajectory, ObsAndAction(obs, action))
+    update!(agent.policy, agent.trajectory)
     action
 end
+
+# update trajectory
+
+function RLBase.update!(::PreActStage, trajectory::AbstractTrajectory, obs)
+    push!(trajectory; state=get_state(obs), action=get_action(obs))
+end
+
+function RLBase.update!(::PostActStage, trajectory::AbstractTrajectory, obs)
+    push!(trajectory; reward=get_reward(obs), terminal=get_terminal(obs))
+end
+
+RLBase.update!(::AbstractStage, trajectory::AbstractTrajectory, obs) = nothing

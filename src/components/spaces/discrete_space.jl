@@ -11,6 +11,7 @@ struct DiscreteSpace{T<:Integer} <: AbstractSpace
     end
 end
 
+Base.show(io::IO, s::DiscreteSpace{T}) where T = print(io, "DiscreteSpace{$T}(low=$(s.low), high=$(s.high)")
 
 Base.eltype(s::DiscreteSpace{T}) where {T} = T
 Base.in(x, s::DiscreteSpace{T}) where {T} = s.low <= x <= s.high

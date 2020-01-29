@@ -2,6 +2,7 @@ export EpsilonGreedyExplorer
 
 using Random
 using StatsBase: sample
+using Distributions: DiscreteNonParametric
 
 """
     EpsilonGreedyExplorer{T}(;kwargs...)
@@ -111,7 +112,8 @@ end
 Random.seed!(s::EpsilonGreedyExplorer, seed) = Random.seed!(s.rng, seed)
 
 """
-    get_distribution(s::EpsilonGreedyExplorer, values)
+    get_distribution(s::EpsilonGreedyExplorer, values) -> DiscreteNonParametric
+    get_distribution(s::EpsilonGreedyExplorer, values, mask) -> DiscreteNonParametric
 
 Return the probability of selecting each action given the estimated `values` of each action.
 """
@@ -122,7 +124,7 @@ function RLBase.get_distribution(s::EpsilonGreedyExplorer, values)
     for ind in max_val_inds
         probs[ind] += (1 - ϵ) / length(max_val_inds)
     end
-    probs
+    DiscreteNonParametric(1:length(probs), probs)
 end
 
 function RLBase.get_distribution(s::EpsilonGreedyExplorer, values, mask)
@@ -133,7 +135,7 @@ function RLBase.get_distribution(s::EpsilonGreedyExplorer, values, mask)
     for ind in max_val_inds
         probs[ind] += (1 - ϵ) / length(max_val_inds)
     end
-    probs
+    DiscreteNonParametric(1:length(probs), probs)
 end
 
 RLBase.reset!(s::EpsilonGreedyExplorer) = s.step=1
