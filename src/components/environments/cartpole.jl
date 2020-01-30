@@ -21,7 +21,7 @@ Base.show(io::IO, params::CartPoleEnvParams) = print(io, join(["$p=$(getfield(pa
 mutable struct CartPoleEnv{T,R<:AbstractRNG} <: AbstractEnv
     params::CartPoleEnvParams{T}
     action_space::DiscreteSpace{Int64}
-    observation_space::MultiContinuousSpace{1}
+    observation_space::MultiContinuousSpace{Vector{T}}
     state::Array{T,1}
     action::Int
     done::Bool

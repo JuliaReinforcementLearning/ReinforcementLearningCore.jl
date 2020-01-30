@@ -60,10 +60,9 @@
 
     @testset "MultiContinuousSpace" begin
         @test_throws ArgumentError MultiContinuousSpace([1, 2], [0, 0])
-        @test_throws ArgumentError MultiContinuousSpace([1, 2, 3, 4], [2 3; 4 5])
         @test_throws ArgumentError MultiContinuousSpace([-1, -2], [1, 2, 3])
 
-        s = MultiContinuousSpace([-1, -2, -3], [1, 2, 3])
+        s = MultiContinuousSpace([-1., -2., -3.], [1., 2., 3.])
         @test eltype(s) == Array{Float64,1}
         @test [0, 0, 0] in s
         @test [-1, -2, -3] in s
@@ -77,10 +76,10 @@
     @testset "TupleSpace and DictSpace" begin
         s = TupleSpace(
             DiscreteSpace(3),
-            ContinuousSpace(0, 1),
-            TupleSpace(DiscreteSpace(3), ContinuousSpace(0, 1)), # recursive
+            ContinuousSpace(0., 1.),
+            TupleSpace(DiscreteSpace(3), ContinuousSpace(0., 1.)), # recursive
             DictSpace(
-                :a => MultiDiscreteSpace([2, 4]),
+                :a => MultiDiscreteSpace([2., 4.]),
                 :b => TupleSpace(
                     MultiContinuousSpace([-1, -2], [2.5, 3.5]),
                     MultiDiscreteSpace([3, 2]),
