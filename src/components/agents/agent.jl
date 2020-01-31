@@ -17,31 +17,78 @@ Generally speaking, it does nothing but
 - `trajectory`::[`AbstractTrajectory`](@ref): used to store transitions between agent and environment
 - `role=DEFAULT_PLAYER`: used to distinguish different agents
 """
-Base.@kwdef mutable struct Agent{P<:AbstractPolicy, B<:AbstractTrajectory, R} <: AbstractAgent
+Base.@kwdef mutable struct Agent{P<:AbstractPolicy, T<:AbstractTrajectory, R} <: AbstractAgent
     policy::P
-    trajectory::B
+    trajectory::T
     role::R = DEFAULT_PLAYER
 end
 
-function (agent::Agent)(stage::AbstractStage, obs)
-    update!(stage, agent.trajectory, obs)
+function (agent::Agent{<:AbstractPolicy, <:EpisodicCompactSARTSATrajectory})(::PreEpisodeStage, obs)
+    empty!(agent.trajectory)
+    nothing
 end
 
-function (agent::Agent)(stage::PreActStage, obs)
+function (agent::Agent{<:AbstractPolicy, <:EpisodicCompactSARTSATrajectory})(::PreActStage, obs)
     action = agent.policy(obs)
-    update!(stage, agent.trajectory, ObsAndAction(obs, action))
-    update!(agent.policy, agent.trajectory)
+    push!(agent.trajectory; state=get_state(obs), action=action)
     action
 end
 
-# update trajectory
-
-function RLBase.update!(::PreActStage, trajectory::AbstractTrajectory, obs)
-    push!(trajectory; state=get_state(obs), action=get_action(obs))
+function (agent::Agent{<:AbstractPolicy, <:EpisodicCompactSARTSATrajectory})(::PostActStage, obs)
+    push!(agent.trajectory; reward=get_reward(obs), terminal=get_terminal(obs))
+    nothing
 end
 
-function RLBase.update!(::PostActStage, trajectory::AbstractTrajectory, obs)
-    push!(trajectory; reward=get_reward(obs), terminal=get_terminal(obs))
+function (agent::Agent{<:AbstractPolicy, <:EpisodicCompactSARTSATrajectory})(::PostEpisodeStage, obs)
+    action = agent.policy(obs)
+    push!(agent.trajectory; state=get_state(obs), action=action)
+    action
 end
 
-RLBase.update!(::AbstractStage, trajectory::AbstractTrajectory, obs) = nothing
+function (agent::Agent{<:AbstractPolicy, <:CircularCompactSARTSATrajectory})(::PreEpisodeStage, obs)
+    if length(agent.trajectory) > 0
+        pop!(agent.trajectory, :state, :action)
+    end
+    nothing
+end
+
+function (agent::Agent{<:AbstractPolicy, <:CircularCompactSARTSATrajectory})(::PreActStage, obs)
+    action = agent.policy(obs)
+    push!(agent.trajectory; state=get_state(obs), action=action)
+    action
+end
+
+function (agent::Agent{<:AbstractPolicy, <:CircularCompactSARTSATrajectory})(::PostActStage, obs)
+    push!(agent.trajectory; reward=get_reward(obs), terminal=get_terminal(obs))
+    nothing
+end
+
+function (agent::Agent{<:AbstractPolicy, <:CircularCompactSARTSATrajectory})(::PostEpisodeStage, obs)
+    action = agent.policy(obs)
+    push!(agent.trajectory;state=get_state(obs), action=action)
+    action
+end
+
+function (agent::Agent{<:AbstractPolicy, <:VectorialCompactSARTSATrajectory})(::PreEpisodeStage, obs)
+    if length(agent.trajectory) > 0
+        pop!(agent.trajectory, :state, :action)
+    end
+    nothing
+end
+
+function (agent::Agent{<:AbstractPolicy, <:VectorialCompactSARTSATrajectory})(::PreActStage, obs)
+    action = agent.policy(obs)
+    push!(agent.trajectory; state=get_state(obs), action=action)
+    action
+end
+
+function (agent::Agent{<:AbstractPolicy, <:VectorialCompactSARTSATrajectory})(::PostActStage, obs)
+    push!(agent.trajectory; reward=get_reward(obs), terminal=get_terminal(obs))
+    nothing
+end
+
+function (agent::Agent{<:AbstractPolicy, <:VectorialCompactSARTSATrajectory})(::PostEpisodeStage, obs)
+    action = agent.policy(obs)
+    push!(agent.trajectory; state=get_state(obs), action=action)
+    action
+end

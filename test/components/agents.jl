@@ -12,10 +12,7 @@
 
     obs2 = (reward=1.0, terminal=true, state=2)
     agent(POST_ACT_STAGE, obs2)
-    agent(POST_EPISODE_STAGE, obs2)
-
-    # peek the last observation
-    dummy_action = agent(PRE_ACT_STAGE, obs2)
+    dummy_action = agent(POST_EPISODE_STAGE, obs2)
 
     @test length(agent.trajectory) == 1
     @test get_trace(agent.trajectory, :state) == [1]

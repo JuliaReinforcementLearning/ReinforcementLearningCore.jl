@@ -6,13 +6,13 @@ function run(::Sequential, agent::AbstractAgent, env::AbstractEnv, stop_conditio
 
     reset!(env)
     obs = observe(env)
-    agent(PRE_EPISODE_STAGE, obs)
     hook(PRE_EPISODE_STAGE, agent, env, obs)
     action = agent(PRE_EPISODE_STAGE, obs)
     hook(PRE_ACT_STAGE, agent, env, obs, action)
 
     while true
         obs = action |> env |> observe
+        agent(POST_ACT_STAGE, obs)
         hook(POST_ACT_STAGE, agent, env, action, obs)
 
         if get_terminal(obs)
