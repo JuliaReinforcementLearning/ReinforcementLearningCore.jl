@@ -119,11 +119,14 @@ mutable struct CircularArrayBuffer{T,N} <: AbstractArray{T,N}
 end
 
 Base.IndexStyle(::CircularArrayBuffer) = IndexLinear()
-Base.size(cb::CircularArrayBuffer{<:Any, N}, i::Integer) where {N} = i == N ? cb.length : size(cb.buffer, i)
+Base.size(cb::CircularArrayBuffer{<:Any,N}, i::Integer) where {N} =
+    i == N ? cb.length : size(cb.buffer, i)
 Base.size(cb::CircularArrayBuffer{<:Any,N}) where {N} = ntuple(M -> size(cb, M), N)
-Base.getindex(cb::CircularArrayBuffer{T, N}, i::Int) where {T, N} = getindex(cb.buffer, _buffer_index(cb, i))
-Base.setindex!(cb::CircularArrayBuffer{T, N}, v, i::Int) where {T, N} = setindex!(cb.buffer, v, _buffer_index(cb, i))
-capacity(cb::CircularArrayBuffer{T, N}) where {T, N} = size(cb.buffer, N)
+Base.getindex(cb::CircularArrayBuffer{T,N}, i::Int) where {T,N} =
+    getindex(cb.buffer, _buffer_index(cb, i))
+Base.setindex!(cb::CircularArrayBuffer{T,N}, v, i::Int) where {T,N} =
+    setindex!(cb.buffer, v, _buffer_index(cb, i))
+capacity(cb::CircularArrayBuffer{T,N}) where {T,N} = size(cb.buffer, N)
 nframes(cb::CircularArrayBuffer) = cb.length
 isfull(cb::CircularArrayBuffer) = cb.length == capacity(cb)
 Base.isempty(cb::CircularArrayBuffer) = cb.length == 0
@@ -160,7 +163,7 @@ end
 
 `update!` the last frame of `cb` with data.
 """
-function RLBase.update!(cb::CircularArrayBuffer{T,N}, data::AbstractArray{T}) where {T, N}
+function RLBase.update!(cb::CircularArrayBuffer{T,N}, data::AbstractArray{T}) where {T,N}
     select_last_dim(cb.buffer, _buffer_frame(cb, cb.length)) .= data
     cb
 end
@@ -177,7 +180,7 @@ function Base.push!(cb::CircularArrayBuffer, data)
     cb
 end
 
-function Base.push!(cb::CircularArrayBuffer{T, N}, ::Missing) where {T, N}
+function Base.push!(cb::CircularArrayBuffer{T,N}, ::Missing) where {T,N}
     if cb.length == capacity(cb)
         cb.first = (cb.first == capacity(cb) ? 1 : cb.first + 1)
     else

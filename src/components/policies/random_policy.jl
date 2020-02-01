@@ -2,7 +2,7 @@ export RandomPolicy
 
 using Random
 
-Base.@kwdef struct RandomPolicy{S<:AbstractSpace, R<:AbstractRNG} <: AbstractPolicy
+Base.@kwdef struct RandomPolicy{S<:AbstractSpace,R<:AbstractRNG} <: AbstractPolicy
     action_space::S
     rng::R = MersenneTwister()
 end
@@ -11,7 +11,8 @@ Base.show(io::IO, p::RandomPolicy) = print(io, "RandomPolicy($(p.action_space))"
 
 Random.seed!(p::RandomPolicy, seed) = Random.seed!(p.rng, seed)
 
-RandomPolicy(env::AbstractEnv; seed=nothing) = RandomPolicy(;action_space = get_action_space(env), rng = MersenneTwister(seed))
+RandomPolicy(env::AbstractEnv; seed = nothing) =
+    RandomPolicy(; action_space = get_action_space(env), rng = MersenneTwister(seed))
 
 (p::RandomPolicy)(obs) = p(ActionStyle(obs), obs)
 

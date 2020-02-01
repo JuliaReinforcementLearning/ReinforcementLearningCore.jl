@@ -1,5 +1,5 @@
 @testset "preprocessors" begin
-    obs1 = (state=[1,2,3],)
+    obs1 = (state = [1, 2, 3],)
     p = CloneStatePreprocessor()
     obs2 = p(obs1)
 

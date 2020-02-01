@@ -1,11 +1,11 @@
 export AbstractHook,
-       ComposedHook,
-       EmptyHook,
-       StepsPerEpisode,
-       RewardsPerEpisode,
-       TotalRewardPerEpisode,
-       CumulativeReward,
-       TimePerStep
+    ComposedHook,
+    EmptyHook,
+    StepsPerEpisode,
+    RewardsPerEpisode,
+    TotalRewardPerEpisode,
+    CumulativeReward,
+    TimePerStep
 
 """
 A hook is called at different stage duiring a [`run`](@ref) to allow users to inject customized runtime logic.
@@ -69,7 +69,12 @@ function (hook::StepsPerEpisode)(::PostActStage, args...)
     hook.count += 1
 end
 
-function (hook::StepsPerEpisode)(::Union{PostEpisodeStage, PostExperimentStage}, agent, env, obs)
+function (hook::StepsPerEpisode)(
+    ::Union{PostEpisodeStage,PostExperimentStage},
+    agent,
+    env,
+    obs,
+)
     push!(hook.steps, hook.count)
     hook.count = 0
     @debug hook.tag STEPS_PER_EPISODE = hook.steps[end]
@@ -120,7 +125,12 @@ function (hook::TotalRewardPerEpisode)(::PostActStage, agent, env, action, obs)
     hook.reward += get_reward(obs)
 end
 
-function (hook::TotalRewardPerEpisode)(::Union{PostEpisodeStage, PostExperimentStage}, agent, env, obs)
+function (hook::TotalRewardPerEpisode)(
+    ::Union{PostEpisodeStage,PostExperimentStage},
+    agent,
+    env,
+    obs,
+)
     push!(hook.rewards, hook.reward)
     hook.reward = 0
     @debug hook.tag REWARD_PER_EPISODE = hook.rewards[end]
@@ -156,13 +166,14 @@ end
 Store time cost of the latest `max_steps` in the `times` field.
 """
 mutable struct TimePerStep <: AbstractHook
-    times::CircularArrayBuffer{Float64, 1}
+    times::CircularArrayBuffer{Float64,1}
     t::UInt64
 end
 
-TimePerStep(;max_steps=100) = TimePerStep(CircularArrayBuffer{Float64}(max_steps), time_ns())
+TimePerStep(; max_steps = 100) =
+    TimePerStep(CircularArrayBuffer{Float64}(max_steps), time_ns())
 
 function (hook::TimePerStep)(::PostActStage, agent, env, action, obs)
-    push!(hook.times, (time_ns() - hook.t)/1e9)
+    push!(hook.times, (time_ns() - hook.t) / 1e9)
     hook.t = time_ns()
 end

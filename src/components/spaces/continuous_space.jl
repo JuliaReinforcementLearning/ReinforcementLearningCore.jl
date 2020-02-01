@@ -14,11 +14,12 @@ end
 
 ContinuousSpace(low, high) = ContinuousSpace(promote(low, high)...)
 
-Base.eltype(::ContinuousSpace{T}) where T = T
+Base.eltype(::ContinuousSpace{T}) where {T} = T
 Base.in(x, s::ContinuousSpace) = s.low <= x <= s.high
 
 # watch https://github.com/JuliaStats/Distributions.jl/pull/951
-Random.rand(rng::AbstractRNG, s::ContinuousSpace{T}) where T = convert(T, rand(rng, Uniform(s.low, s.high)))
+Random.rand(rng::AbstractRNG, s::ContinuousSpace{T}) where {T} =
+    convert(T, rand(rng, Uniform(s.low, s.high)))
 
 Base.length(::ContinuousSpace) = throw(DomainError("ContinuousSpace is uncountable"))
 element_length(::ContinuousSpace) = 0

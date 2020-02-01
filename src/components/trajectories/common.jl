@@ -1,8 +1,9 @@
-const CompactSARTSATrajectory = Union{CircularCompactSARTSATrajectory, VectorialCompactSARTSATrajectory}
+const CompactSARTSATrajectory =
+    Union{CircularCompactSARTSATrajectory,VectorialCompactSARTSATrajectory}
 
 function RLBase.get_trace(b::CompactSARTSATrajectory, s::Symbol)
     if s == :state || s == :action
-        select_last_dim(b[s], 1:(length(b[s]) > 1 ? length(b[s])-1 : length(b[s])))
+        select_last_dim(b[s], 1:(length(b[s]) > 1 ? length(b[s]) - 1 : length(b[s])))
     elseif s == :reward || s == :terminal
         b[s]
     elseif s == :next_state
@@ -23,8 +24,8 @@ function Base.getindex(b::CompactSARTSATrajectory, i::Int)
         action = select_last_dim(b[:action], i),
         reward = select_last_dim(b[:reward], i),
         terminal = select_last_dim(b[:terminal], i),
-        next_state = select_last_dim(b[:state], i+1),
-        next_action = select_last_dim(b[:action], i+1)
+        next_state = select_last_dim(b[:state], i + 1),
+        next_action = select_last_dim(b[:action], i + 1),
     )
 end
 
