@@ -1,5 +1,5 @@
 export MultiDiscreteSpace
-using Random: AbstractRNG
+using Random
 
 struct MultiDiscreteSpace{T<:AbstractArray} <: AbstractSpace
     low::T
@@ -18,7 +18,7 @@ Base.length(s::MultiDiscreteSpace) = s.n
 Base.eltype(s::MultiDiscreteSpace{T}) where {T} = T
 Base.in(xs, s::MultiDiscreteSpace) =
     size(xs) == size(s.low) && all(map((l, x, h) -> l <= x <= h, s.low, xs, s.high))
-Base.rand(rng::AbstractRNG, s::MultiDiscreteSpace) =
+Random.rand(rng::AbstractRNG, s::MultiDiscreteSpace) =
     map((l, h) -> rand(rng, l:h), s.low, s.high)
 
 element_size(s::MultiDiscreteSpace) = size(s.low)

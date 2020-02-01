@@ -1,5 +1,5 @@
 export DiscreteSpace
-using Random: AbstractRNG
+using Random
 
 struct DiscreteSpace{T<:Integer} <: AbstractSpace
     low::T
@@ -15,7 +15,7 @@ Base.show(io::IO, s::DiscreteSpace{T}) where T = print(io, "DiscreteSpace{$T}(lo
 
 Base.eltype(s::DiscreteSpace{T}) where {T} = T
 Base.in(x, s::DiscreteSpace{T}) where {T} = s.low <= x <= s.high
-Base.rand(rng::AbstractRNG, s::DiscreteSpace) = rand(rng, s.low:s.high)
+Random.rand(rng::AbstractRNG, s::DiscreteSpace) = rand(rng, s.low:s.high)
 
 Base.length(s::DiscreteSpace) = s.n
 element_length(::DiscreteSpace) = 0

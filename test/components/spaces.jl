@@ -90,4 +90,17 @@
         test_samples(s)
     end
 
+    # https://github.com/JuliaReinforcementLearning/ReinforcementLearningEnvironments.jl/pull/28
+    if Flux.use_cuda[]
+        using CuArrays
+        @testset "MultiContinuousSpace with CuArrays" begin
+            low = cu([1. 2.; 3. 4.])
+            high = cu([2. 3.; 4. 5.])
+            s = MultiContinuousSpace(low, high)
+
+            @test low ∈ s
+            test_samples(s)
+            @test high ∈ s
+        end
+    end
 end
