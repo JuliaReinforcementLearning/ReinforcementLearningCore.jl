@@ -62,6 +62,8 @@ function (s::StopAfterStep{Progress})(args...)
 
 
     # showvalues = [(Symbol(s.tag, "/", :STEP), s.cur)],  # https://github.com/timholy/ProgressMeter.jl/pull/131
+
+    # showvalues = [(Symbol(s.tag, "/", :STEP), s.cur)],  # https://github.com/timholy/ProgressMeter.jl/pull/131
     next!(s.progress;
     # showvalues = [(Symbol(s.tag, "/", :STEP), s.cur)],  # https://github.com/timholy/ProgressMeter.jl/pull/131
 )
@@ -107,6 +109,8 @@ end
 
 function (s::StopAfterEpisode{Progress})(agent, env, obs)
 
+
+    # showvalues = [(Symbol(s.tag, "/", :EPISODE), s.cur)],  # https://github.com/timholy/ProgressMeter.jl/pull/131
 
     # showvalues = [(Symbol(s.tag, "/", :EPISODE), s.cur)],  # https://github.com/timholy/ProgressMeter.jl/pull/131
     next!(s.progress;
