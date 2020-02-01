@@ -29,6 +29,7 @@ function (agent::Agent{<:AbstractPolicy, <:EpisodicCompactSARTSATrajectory})(::P
 end
 
 function (agent::Agent{<:AbstractPolicy, <:EpisodicCompactSARTSATrajectory})(::PreActStage, obs)
+    update!(agent.policy, agent.trajectory)
     action = agent.policy(obs)
     push!(agent.trajectory; state=get_state(obs), action=action)
     action
@@ -53,6 +54,7 @@ function (agent::Agent{<:AbstractPolicy, <:CircularCompactSARTSATrajectory})(::P
 end
 
 function (agent::Agent{<:AbstractPolicy, <:CircularCompactSARTSATrajectory})(::PreActStage, obs)
+    update!(agent.policy, agent.trajectory)
     action = agent.policy(obs)
     push!(agent.trajectory; state=get_state(obs), action=action)
     action
@@ -77,6 +79,7 @@ function (agent::Agent{<:AbstractPolicy, <:VectorialCompactSARTSATrajectory})(::
 end
 
 function (agent::Agent{<:AbstractPolicy, <:VectorialCompactSARTSATrajectory})(::PreActStage, obs)
+    update!(agent.policy, agent.trajectory)
     action = agent.policy(obs)
     push!(agent.trajectory; state=get_state(obs), action=action)
     action
