@@ -7,9 +7,6 @@
     end
 
     @testset "DiscreteSpace" begin
-        @test_throws ArgumentError DiscreteSpace(0)
-        @test_throws MethodError DiscreteSpace(2.2)
-
         s = DiscreteSpace(3)
         @test length(s) == 3
         @test eltype(s) == Int
@@ -22,6 +19,15 @@
         @test !(4 in s)
 
         test_samples(s)
+
+        s0 = DiscreteSpace(-2, 2)
+        s1 = DiscreteSpace(-2:2)
+        @test s0 == s1
+        s2 = convert(AbstractSpace, (:up, :down, :left, :right))
+        s3 = convert(AbstractSpace, ["a", "b", "c"])
+
+        @test s2 isa DiscreteSpace
+        @test s3 isa DiscreteSpace
     end
 
     @testset "MultiDiscreteSpace" begin

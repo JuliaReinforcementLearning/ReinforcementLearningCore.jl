@@ -1,23 +1,25 @@
 export DiscreteSpace
 using Random
 
-struct DiscreteSpace{T<:Integer} <: AbstractSpace
-    low::T
-    high::T
-    n::T
-    function DiscreteSpace(high::T, low = one(T)) where {T<:Integer}
-        high >= low || throw(ArgumentError("$high must be >= $low"))
-        new{T}(low, high, high - low + 1)
-    end
+struct DiscreteSpace{T} <: AbstractSpace
+    span::T
 end
 
-Base.show(io::IO, s::DiscreteSpace{T}) where {T} =
-    print(io, "DiscreteSpace{$T}(low=$(s.low), high=$(s.high)")
+DiscreteSpace(high::T) where {T<:Integer} = DiscreteSpace(one(T), high)
 
-Base.eltype(s::DiscreteSpace{T}) where {T} = T
-Base.in(x, s::DiscreteSpace{T}) where {T} = s.low <= x <= s.high
-Random.rand(rng::AbstractRNG, s::DiscreteSpace) = rand(rng, s.low:s.high)
+function DiscreteSpace(low::T, high::T) where {T<:Integer}
+    high >= low || throw(ArgumentError("$high must be >= $low"))
+    DiscreteSpace(low:high)
+end
 
-Base.length(s::DiscreteSpace) = s.n
+DiscreteSpace(low, high) = DiscreteSpace(promote(low, high)...)
+
+Base.eltype(s::DiscreteSpace) = eltype(s.span)
+Base.in(x, s::DiscreteSpace) = x in s.span
+Random.rand(rng::AbstractRNG, s::DiscreteSpace) = rand(rng, s.span)
+
+Base.length(s::DiscreteSpace) = length(s.span)
 element_length(::DiscreteSpace) = 0
 element_size(::DiscreteSpace) = ()
+
+Base.convert(::Type{AbstractSpace}, s::Union{<:Integer, <:UnitRange, <:Vector, <:Tuple}) = DiscreteSpace(s)

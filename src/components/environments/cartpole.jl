@@ -23,7 +23,7 @@ Base.show(io::IO, params::CartPoleEnvParams) = print(
 
 mutable struct CartPoleEnv{T,R<:AbstractRNG} <: AbstractEnv
     params::CartPoleEnvParams{T}
-    action_space::DiscreteSpace{Int64}
+    action_space::DiscreteSpace{UnitRange{Int64}}
     observation_space::MultiContinuousSpace{Vector{T}}
     state::Array{T,1}
     action::Int
