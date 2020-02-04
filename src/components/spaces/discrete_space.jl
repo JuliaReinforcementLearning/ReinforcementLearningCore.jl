@@ -22,4 +22,5 @@ Base.length(s::DiscreteSpace) = length(s.span)
 element_length(::DiscreteSpace) = 0
 element_size(::DiscreteSpace) = ()
 
-Base.convert(::Type{AbstractSpace}, s::Union{<:Integer, <:UnitRange, <:Vector, <:Tuple}) = DiscreteSpace(s)
+Base.convert(::Type{AbstractSpace}, s::Union{<:Integer,<:UnitRange,<:Vector,<:Tuple}) =
+    DiscreteSpace(s)
