@@ -8,8 +8,8 @@ struct StateOverriddenObs{O,S}
 end
 
 @forward StateOverriddenObs.obs RLBase.ActionStyle,
-RLBase.legal_actions,
-RLBase.legal_actions_mask,
+RLBase.get_legal_actions,
+RLBase.get_legal_actions_mask,
 RLBase.get_terminal,
 RLBase.get_reward
 
@@ -21,8 +21,8 @@ struct ObsAndAction{O,A}
 end
 
 @forward ObsAndAction.obs RLBase.ActionStyle,
-RLBase.legal_actions,
-RLBase.legal_actions_mask,
+RLBase.get_legal_actions,
+RLBase.get_legal_actions_mask,
 RLBase.get_terminal,
 RLBase.get_reward,
 RLBase.get_state
