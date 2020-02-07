@@ -4,17 +4,25 @@ export VBasedPolicy
 # Fields
 
 - `value_learner`::[`AbstractLearner`](@ref), learn how to estimate state values.
-- `mapping`, an arbitrary function, used to transform the state values into action values.
+- `mapping`, a customized function `(obs, value_learner) -> action_values`
 - `explorer`::[`AbstractExplorer`](@ref), decide which action to take based on action values.
 """
-struct VBasedPolicy{L<:AbstractLearner, M, E<:AbstractExplorer} <: AbstractPolicy
+Base.@kwdef struct VBasedPolicy{L<:AbstractLearner, M, E<:AbstractExplorer} <: AbstractPolicy
     value_learner::L
     mapping::M
     explorer::E
 end
 
-(p::VBasedPolicy)(obs) = obs |> p.value_learner |> p.mapping |> p.explorer
+(p::VBasedPolicy)(obs, ::MinimalActionSet) = p.mapping(obs, p.value_learner) |> p.explorer
 
-RLBase.update!(p::VBasedPolicy, experience) = update!(p.value_learner, experience)
+function (p::VBasedPolicy)(obs, ::FullActionSet)
+    action_values = p.mapping(obs, p.value_learner) 
+    p.explorer(action_values, get_legal_actions_mask(obs))
+end
 
-RLBase.extract_experience(trajectory<:AbstractTrajectory, p::VBasedPolicy) = extract_experience(trajectory, p.value_learner)
+function RLBase.update!(p::VBasedPolicy, t::AbstractTrajectory)
+    experience = extract_experience(t, p)
+    update!(p.value_learner, experience)
+end
+
+RLBase.extract_experience(trajectory::AbstractTrajectory, p::VBasedPolicy) = extract_experience(trajectory, p.value_learner)

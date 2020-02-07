@@ -1,7 +1,6 @@
 include("spaces/spaces.jl")
 include("environments/environments.jl")
-include("learners/learners.jl")
-include("policies/random_policy.jl")
+include("policies/policies.jl")
 include("approximators/approximators.jl")
 include("explorers/explorers.jl")
 include("trajectories/trajectories.jl")

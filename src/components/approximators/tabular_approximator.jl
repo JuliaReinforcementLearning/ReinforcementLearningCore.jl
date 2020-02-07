@@ -24,11 +24,24 @@ end
 
 (app::TabularApproximator{1})(s) = @views app.table[s]
 
-(app::TabularApproximator{2})(s, a) = @views app.table[a, s]
+(app::TabularApproximator{2})(s) = @views app.table[:, s]
+(app::TabularApproximator{2})(s, a) = app(s)[a]
 
-function RLBase.update!(app::TabularApproximator, correction::Pair)
+function RLBase.update!(app::TabularApproximator{1}, correction::Pair)
     s, e = correction
     app.table[s] += e
+end
+
+function RLBase.update!(app::TabularApproximator{2}, correction::Pair)
+    (s, a), e = correction
+    app.table[a, s] += e
+end
+
+function RLBase.update!(Q::TabularApproximator{2}, correction::Pair{Int,Vector{Float64}})
+    s, errors = correction
+    for (a, e) in enumerate(errors)
+        Q.table[a, s] += e
+    end
 end
 
 RLBase.ApproximatorStyle(::TabularApproximator{1}) = VApproximator()

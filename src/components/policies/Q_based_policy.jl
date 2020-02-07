@@ -1,0 +1,23 @@
+export QBasedPolicy
+
+"""
+    QBasedPolicy(learner::Q, explorer::S) -> QBasedPolicy{Q, S}
+Use a Q-`learner` to generate the estimations of actions and use `explorer` to get the action.
+"""
+Base.@kwdef struct QBasedPolicy{
+    Q<:AbstractLearner,
+    E<:AbstractExplorer,
+} <: AbstractPolicy
+    learner::Q
+    explorer::E
+end
+
+(π::QBasedPolicy)(obs, ::MinimalActionSet) = obs |> π.learner |> π.explorer
+(π::QBasedPolicy)(obs, ::FullActionSet) = π.explorer(π.learner(obs), get_legal_actions_mask(obs))
+
+function RLBase.update!(p::QBasedPolicy, t::AbstractTrajectory)
+    experience = extract_experience(t, p)
+    update!(p.learner, experience)
+end
+
+RLBase.extract_experience(trajectory::AbstractTrajectory, p::QBasedPolicy) = extract_experience(trajectory, p.learner)

@@ -24,3 +24,5 @@ element_size(::DiscreteSpace) = ()
 
 Base.convert(::Type{AbstractSpace}, s::Union{<:Integer,<:UnitRange,<:Vector,<:Tuple}) =
     DiscreteSpace(s)
+
+Base.iterate(s::DiscreteSpace, args...) = iterate(s.span, args...)

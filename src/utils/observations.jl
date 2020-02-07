@@ -2,7 +2,7 @@ export StateOverriddenObs, ObsAndAction
 
 using MacroTools: @forward
 
-struct StateOverriddenObs{O,S}
+Base.@kwdef struct StateOverriddenObs{O,S}
     obs::O
     state::S
 end
