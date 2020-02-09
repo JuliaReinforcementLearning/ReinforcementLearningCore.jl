@@ -1,7 +1,6 @@
 export EpsilonGreedyExplorer
 
 using Random
-using StatsBase: sample
 using Distributions: DiscreteNonParametric
 
 """
@@ -79,6 +78,8 @@ end
 
 EpsilonGreedyExplorer(ϵ) = EpsilonGreedyExplorer(; ϵ_stable = ϵ)
 
+GreedyExplorer() = EpsilonGreedyExplorer(0.)
+
 function get_ϵ(s::EpsilonGreedyExplorer{:linear}, step)
     if step <= s.warmup_steps
         s.ϵ_init
@@ -115,25 +116,25 @@ get_ϵ(s::EpsilonGreedyExplorer) = get_ϵ(s, s.step)
 function (s::EpsilonGreedyExplorer)(values)
     ϵ = get_ϵ(s)
     s.step += 1
-    rand(s.rng) > ϵ ? sample(s.rng, find_all_max(values)[2]) : rand(s.rng, 1:length(values))
+    rand(s.rng) >= ϵ ? rand(s.rng, find_all_max(values)[2]) : rand(s.rng, 1:length(values))
 end
 
 function (s::EpsilonGreedyExplorer)(values, mask)
     ϵ = get_ϵ(s)
     s.step += 1
-    rand(s.rng) > ϵ ? sample(s.rng, find_all_max(values, mask)[2]) :
+    rand(s.rng) >= ϵ ? rand(s.rng, find_all_max(values, mask)[2]) :
     rand(s.rng, findall(mask))
 end
 
 Random.seed!(s::EpsilonGreedyExplorer, seed) = Random.seed!(s.rng, seed)
 
 """
-    get_distribution(s::EpsilonGreedyExplorer, values) -> DiscreteNonParametric
-    get_distribution(s::EpsilonGreedyExplorer, values, mask) -> DiscreteNonParametric
+    get_prob(s::EpsilonGreedyExplorer, values) -> DiscreteNonParametric
+    get_prob(s::EpsilonGreedyExplorer, values, mask) -> DiscreteNonParametric
 
 Return the probability of selecting each action given the estimated `values` of each action.
 """
-function RLBase.get_distribution(s::EpsilonGreedyExplorer, values)
+function RLBase.get_prob(s::EpsilonGreedyExplorer, values)
     ϵ, n = get_ϵ(s), length(values)
     probs = fill(ϵ / n, n)
     max_val_inds = find_all_max(values)[2]
@@ -143,7 +144,7 @@ function RLBase.get_distribution(s::EpsilonGreedyExplorer, values)
     DiscreteNonParametric(1:length(probs), probs)
 end
 
-function RLBase.get_distribution(s::EpsilonGreedyExplorer, values, mask)
+function RLBase.get_prob(s::EpsilonGreedyExplorer, values, mask)
     ϵ, n = get_ϵ(s), length(values)
     probs = zeros(n)
     probs[mask] .= ϵ / sum(mask)

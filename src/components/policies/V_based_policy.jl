@@ -10,7 +10,7 @@ export VBasedPolicy
 Base.@kwdef struct VBasedPolicy{L<:AbstractLearner, M, E<:AbstractExplorer} <: AbstractPolicy
     value_learner::L
     mapping::M
-    explorer::E
+    explorer::E = GreedyExplorer()
 end
 
 (p::VBasedPolicy)(obs, ::MinimalActionSet) = p.mapping(obs, p.value_learner) |> p.explorer
@@ -18,6 +18,15 @@ end
 function (p::VBasedPolicy)(obs, ::FullActionSet)
     action_values = p.mapping(obs, p.value_learner) 
     p.explorer(action_values, get_legal_actions_mask(obs))
+end
+
+function RLBase.get_prob(p::VBasedPolicy, obs, ::MinimalActionSet)
+    get_prob(p.explorer, p.mapping(obs, p.value_learner))
+end
+
+function RLBase.get_prob(p::VBasedPolicy, obs, ::FullActionSet)
+    action_values = p.mapping(obs, p.value_learner) 
+    get_prob(p.explorer, action_values, get_legal_actions_mask(obs))
 end
 
 function RLBase.update!(p::VBasedPolicy, t::AbstractTrajectory)
