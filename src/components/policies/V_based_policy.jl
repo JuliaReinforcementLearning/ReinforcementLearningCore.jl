@@ -29,9 +29,11 @@ function RLBase.get_prob(p::VBasedPolicy, obs, ::FullActionSet)
     get_prob(p.explorer, action_values, get_legal_actions_mask(obs))
 end
 
+RLBase.update!(p::VBasedPolicy, experience) = update!(p.value_learner, experience)
+
 function RLBase.update!(p::VBasedPolicy, t::AbstractTrajectory)
     experience = extract_experience(t, p)
-    update!(p.value_learner, experience)
+    isnothing(experience) || update!(p, experience)
 end
 
 RLBase.extract_experience(trajectory::AbstractTrajectory, p::VBasedPolicy) = extract_experience(trajectory, p.value_learner)

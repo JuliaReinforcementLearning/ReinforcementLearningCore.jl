@@ -1,4 +1,4 @@
-export EpsilonGreedyExplorer
+export EpsilonGreedyExplorer, GreedyExplorer
 
 using Random
 using Distributions: DiscreteNonParametric

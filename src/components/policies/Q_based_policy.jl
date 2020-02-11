@@ -17,7 +17,7 @@ end
 
 function RLBase.update!(p::QBasedPolicy, t::AbstractTrajectory)
     experience = extract_experience(t, p)
-    update!(p.learner, experience)
+    isnothing(experience) || update!(p.learner, experience)
 end
 
 RLBase.extract_experience(trajectory::AbstractTrajectory, p::QBasedPolicy) = extract_experience(trajectory, p.learner)

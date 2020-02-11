@@ -11,7 +11,7 @@ function run(
     agent::AbstractAgent,
     env::AbstractEnv,
     stop_condition,
-    hook::AbstractHook,
+    hook::AbstractHook=EmptyHook(),
 )
 
     reset!(env)
