@@ -21,3 +21,5 @@ function RLBase.update!(p::QBasedPolicy, t::AbstractTrajectory)
 end
 
 RLBase.extract_experience(trajectory::AbstractTrajectory, p::QBasedPolicy) = extract_experience(trajectory, p.learner)
+RLBase.get_prob(p::QBasedPolicy, obs, ::MinimalActionSet) = get_prob(p.explorer, p.learner(obs))
+RLBase.get_prob(p::QBasedPolicy, obs, ::FullActionSet) = get_prob(p.explorer, p.learner(obs), get_legal_actions_mask(obs))

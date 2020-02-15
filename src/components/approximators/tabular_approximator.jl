@@ -22,10 +22,10 @@ function TabularApproximator(;n_state, n_action=nothing, init=0.)
     TabularApproximator(table)
 end
 
-(app::TabularApproximator{1})(s) = @views app.table[s]
+(app::TabularApproximator{1})(s::Int) = @views app.table[s]
 
-(app::TabularApproximator{2})(s) = @views app.table[:, s]
-(app::TabularApproximator{2})(s, a) = app(s)[a]
+(app::TabularApproximator{2})(s::Int) = @views app.table[:, s]
+(app::TabularApproximator{2})(s::Int, a::Int) = app(s)[a]
 
 function RLBase.update!(app::TabularApproximator{1}, correction::Pair)
     s, e = correction
