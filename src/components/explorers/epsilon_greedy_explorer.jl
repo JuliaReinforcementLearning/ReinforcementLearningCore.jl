@@ -7,6 +7,9 @@ using Distributions: DiscreteNonParametric
     EpsilonGreedyExplorer{T}(;kwargs...)
     EpsilonGreedyExplorer(ϵ) -> EpsilonGreedyExplorer{:linear}(; ϵ_stable = ϵ)
 
+!!! warning
+    TODO: There's a performance issue with GreedyExplorer
+
 > Epsilon-greedy strategy: The best lever is selected for a proportion `1 - epsilon` of the trials, and a lever is selected at random (with uniform probability) for a proportion epsilon . [Multi-armed_bandit](https://en.wikipedia.org/wiki/Multi-armed_bandit)
 
 Two kinds of epsilon-decreasing strategy are implmented here (`linear` and `exp`).

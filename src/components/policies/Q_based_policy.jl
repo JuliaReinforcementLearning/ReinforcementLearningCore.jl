@@ -20,6 +20,10 @@ function RLBase.update!(p::QBasedPolicy, t::AbstractTrajectory)
     isnothing(experience) || update!(p.learner, experience)
 end
 
+RLBase.update!(p::QBasedPolicy, m::AbstractEnvironmentModel, t::AbstractTrajectory, n::Int) = update!(p.learner, m, t, n)
+
 RLBase.extract_experience(trajectory::AbstractTrajectory, p::QBasedPolicy) = extract_experience(trajectory, p.learner)
 RLBase.get_prob(p::QBasedPolicy, obs, ::MinimalActionSet) = get_prob(p.explorer, p.learner(obs))
 RLBase.get_prob(p::QBasedPolicy, obs, ::FullActionSet) = get_prob(p.explorer, p.learner(obs), get_legal_actions_mask(obs))
+
+RLBase.get_priority(p::QBasedPolicy, experience) = get_priority(p.learner, experience)
