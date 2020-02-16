@@ -1,5 +1,3 @@
-include("spaces/spaces.jl")
-include("environments/environments.jl")
 include("learners/learners.jl")
 include("policies/policies.jl")
 include("approximators/approximators.jl")

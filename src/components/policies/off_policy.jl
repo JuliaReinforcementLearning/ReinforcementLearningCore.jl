@@ -20,8 +20,8 @@ function RLBase.update!(π::OffPolicy{<:VBasedPolicy}, transitions::NamedTuple)
     weights = [
         get_prob(π.π_target, (state=s,), a) / get_prob(π.π_behavior, (state=s,), a)
         for (s, a) in zip(
-            transitions.state,
-            transitions.action,
+            transitions.states,
+            transitions.actions,
             )]  # TODO: implement iterate interface for (SubArray of) CircularArrayBuffer
     experience = merge(transitions, (weights=weights,))
     update!(π.π_target, experience)

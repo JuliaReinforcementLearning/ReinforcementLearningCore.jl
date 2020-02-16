@@ -13,8 +13,7 @@ Random.seed!(p::RandomPolicy, seed) = Random.seed!(p.rng, seed)
 
 RandomPolicy(s;seed=nothing) = RandomPolicy(s, MersenneTwister(seed))
 
-RandomPolicy(env::AbstractEnv; seed = nothing) =
-    RandomPolicy(; action_space = get_action_space(env), rng = MersenneTwister(seed))
+RandomPolicy(env::AbstractEnv; seed = nothing) = RandomPolicy(get_action_space(env), MersenneTwister(seed))
 
 (p::RandomPolicy)(obs, ::FullActionSet) = rand(p.rng, get_legal_actions(obs))
 (p::RandomPolicy)(obs, ::MinimalActionSet) = rand(p.rng, p.action_space)
