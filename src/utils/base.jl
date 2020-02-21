@@ -1,4 +1,6 @@
-export select_last_dim, select_last_frame, consecutive_view, find_all_max, find_max
+export select_last_dim, select_last_frame, consecutive_view, find_all_max, find_max, huber_loss
+
+using StatsBase
 
 select_last_dim(xs::AbstractArray{T,N}, inds) where {T,N} =
     @views xs[ntuple(_ -> (:), N - 1)..., inds]
@@ -115,4 +117,11 @@ function find_max(A, mask)
         end
     end
     maxval, ind
+end
+
+function huber_loss(labels, predictions;δ = 1.0f0)
+    abs_error = abs.(predictions .- labels)
+    quadratic = min.(abs_error, 1.0f0)  # quadratic = min.(abs_error, δ)
+    linear = abs_error .- quadratic
+    mean(0.5f0 .* quadratic .* quadratic .+ linear)  # 0.5f0 .* quadratic .* quadratic .+ δ .* linear
 end
