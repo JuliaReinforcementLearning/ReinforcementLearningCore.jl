@@ -26,3 +26,5 @@ Flux.params(app::NeuralNetworkApproximator) = app.params
 RLBase.batch_estimate(app::NeuralNetworkApproximator, states::AbstractArray) = app.model(states)
 
 RLBase.update!(app::NeuralNetworkApproximator, gs) = Flux.Optimise.update!(app.optimizer, app.params, gs)
+
+Base.copyto!(dest::NeuralNetworkApproximator, src::NeuralNetworkApproximator) = Flux.loadparams!(dest.model, src.params)

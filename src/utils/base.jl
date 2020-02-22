@@ -1,4 +1,4 @@
-export select_last_dim, select_last_frame, consecutive_view, find_all_max, find_max, huber_loss
+export select_last_dim, select_last_frame, consecutive_view, find_all_max, find_max, huber_loss, discount_rewards, discount_rewards!, discount_rewards_reduced
 
 using StatsBase
 
@@ -125,3 +125,15 @@ function huber_loss(labels, predictions;δ = 1.0f0)
     linear = abs_error .- quadratic
     mean(0.5f0 .* quadratic .* quadratic .+ linear)  # 0.5f0 .* quadratic .* quadratic .+ δ .* linear
 end
+
+function discount_rewards!(new_rewards, rewards, γ)
+    new_rewards[end] = rewards[end]
+    for i = (length(rewards) - 1):-1:1
+        new_rewards[i] = rewards[i] + new_rewards[i+1] * γ
+    end
+    new_rewards
+end
+
+discount_rewards(rewards, γ) = discount_rewards!(similar(rewards), rewards, γ)
+
+discount_rewards_reduced(rewards, γ) = foldr((r, g) -> r + γ * g, rewards)
