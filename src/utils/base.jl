@@ -1,4 +1,4 @@
-export select_last_dim, select_last_frame, consecutive_view, find_all_max, find_max, huber_loss,  huber_loss_unreduced, discount_rewards, discount_rewards!, discount_rewards_reduced
+export select_last_dim, select_last_frame, consecutive_view, find_all_max, find_max, huber_loss,  huber_loss_unreduced, discount_rewards, discount_rewards!, discount_rewards_reduced, logitcrossentropy_unreduced
 
 using StatsBase
 
@@ -117,6 +117,10 @@ function find_max(A, mask)
         end
     end
     maxval, ind
+end
+
+function logitcrossentropy_unreduced(logŷ::AbstractVecOrMat, y::AbstractVecOrMat)
+  return vec(-sum(y .* logsoftmax(logŷ), dims=1))
 end
 
 function huber_loss_unreduced(labels, predictions;δ = 1.0f0)
