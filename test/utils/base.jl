@@ -71,7 +71,7 @@
 
         t[:] .= 1
         @test t == ones(8)
-        @test all([RL.Utils.get(t, v)[1] == i for (i, v) in enumerate(0.5:1.0:8)])
+        @test all([get(t, v)[1] == i for (i, v) in enumerate(0.5:1.0:8)])
 
         empty!(t)
         @test capacity(t) == 8

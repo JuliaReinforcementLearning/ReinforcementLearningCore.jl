@@ -123,7 +123,7 @@ function Base.empty!(t::SumTree)
 end
 
 "!!! this is unsafe, always check the `real_ind`, or you may get bound error in some extreme cases."
-function get(t::SumTree, v)
+function Base.get(t::SumTree, v)
     parent_ind = 1
     leaf_ind = parent_ind
     while true
