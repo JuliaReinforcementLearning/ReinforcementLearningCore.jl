@@ -199,4 +199,4 @@ function Base.pop!(cb::CircularArrayBuffer)
     res
 end
 
-nframes(a::AbstractArray{T, N}) where {T, N} = size(a, N)
+nframes(a::AbstractArray{T,N}) where {T,N} = size(a, N)
