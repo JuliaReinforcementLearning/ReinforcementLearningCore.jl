@@ -1,4 +1,14 @@
-export select_last_dim, select_last_frame, consecutive_view, find_all_max, find_max, huber_loss,  huber_loss_unreduced, discount_rewards, discount_rewards!, discount_rewards_reduced, logitcrossentropy_unreduced
+export select_last_dim,
+    select_last_frame,
+    consecutive_view,
+    find_all_max,
+    find_max,
+    huber_loss,
+    huber_loss_unreduced,
+    discount_rewards,
+    discount_rewards!,
+    discount_rewards_reduced,
+    logitcrossentropy_unreduced
 
 using StatsBase
 
@@ -120,21 +130,22 @@ function find_max(A, mask)
 end
 
 function logitcrossentropy_unreduced(logŷ::AbstractVecOrMat, y::AbstractVecOrMat)
-  return vec(-sum(y .* logsoftmax(logŷ), dims=1))
+    return vec(-sum(y .* logsoftmax(logŷ), dims = 1))
 end
 
-function huber_loss_unreduced(labels, predictions;δ = 1.0f0)
+function huber_loss_unreduced(labels, predictions; δ = 1.0f0)
     abs_error = abs.(predictions .- labels)
     quadratic = min.(abs_error, 1.0f0)  # quadratic = min.(abs_error, δ)
     linear = abs_error .- quadratic
     0.5f0 .* quadratic .* quadratic .+ linear  # 0.5f0 .* quadratic .* quadratic .+ δ .* linear
 end
 
-huber_loss(labels, predictions;δ = 1.0f0) = huber_loss_unreduced(labels, predictions;δ=δ) |> mean
+huber_loss(labels, predictions; δ = 1.0f0) =
+    huber_loss_unreduced(labels, predictions; δ = δ) |> mean
 
 function discount_rewards!(new_rewards, rewards, γ)
     new_rewards[end] = rewards[end]
-    for i = (length(rewards) - 1):-1:1
+    for i in (length(rewards)-1):-1:1
         new_rewards[i] = rewards[i] + new_rewards[i+1] * γ
     end
     new_rewards

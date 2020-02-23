@@ -2,22 +2,32 @@ export CircularCompactPSARTSATrajectory
 
 using MacroTools: @forward
 
-struct CircularCompactPSARTSATrajectory{T<:CircularCompactSARTSATrajectory, P, names, types} <: AbstractTrajectory{names, types}
+struct CircularCompactPSARTSATrajectory{T<:CircularCompactSARTSATrajectory,P,names,types} <:
+       AbstractTrajectory{names,types}
     trajectory::T
     priority::P
 end
 
-function CircularCompactPSARTSATrajectory(;kw...) 
-    t = CircularCompactSARTSATrajectory(;kw...)
+function CircularCompactPSARTSATrajectory(; kw...)
+    t = CircularCompactSARTSATrajectory(; kw...)
     p = SumTree(kw.data.capacity)
     names = typeof(t).parameters[1]
     types = typeof(t).parameters[2]
-    CircularCompactPSARTSATrajectory{typeof(t), typeof(p), (names..., :priority), Tuple{types.parameters..., eltype(p)}}(t, p)
+    CircularCompactPSARTSATrajectory{
+        typeof(t),
+        typeof(p),
+        (names..., :priority),
+        Tuple{types.parameters...,eltype(p)},
+    }(
+        t,
+        p,
+    )
 end
 
 @forward CircularCompactPSARTSATrajectory.trajectory Base.length, Base.isempty
 
-RLBase.get_trace(t::CircularCompactPSARTSATrajectory, s::Symbol) = s == :priority ? t.priority : get_trace(t.trajectory, s)
+RLBase.get_trace(t::CircularCompactPSARTSATrajectory, s::Symbol) =
+    s == :priority ? t.priority : get_trace(t.trajectory, s)
 
 function Base.getindex(b::CircularCompactPSARTSATrajectory, i::Int)
     (

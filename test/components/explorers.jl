@@ -6,7 +6,7 @@
             Random.seed!(explorer, 123)
 
             values = [0, 1, 2, -1]
-            target_prob =[0.025, 0.025, 0.925, 0.025]
+            target_prob = [0.025, 0.025, 0.925, 0.025]
 
             # https://github.com/JuliaLang/julia/issues/10391#issuecomment-488642687
             # @test isapprox(get_prob(explorer, values), target_prob)

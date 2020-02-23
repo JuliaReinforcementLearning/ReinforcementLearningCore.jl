@@ -73,7 +73,7 @@ end
 capacity(t::SumTree) = t.capacity
 Base.length(t::SumTree) = t.length
 Base.size(t::SumTree) = (length(t),)
-Base.eltype(t::SumTree{T}) where T = T
+Base.eltype(t::SumTree{T}) where {T} = T
 
 function _index(t::SumTree, i::Int)
     ind = i + t.first - 1
@@ -152,7 +152,7 @@ sample(t::SumTree) = sample(Random.GLOBAL_RNG, t)
 
 function sample(rng::AbstractRNG, t::SumTree, n::Int)
     inds, priorities = Vector{Int}(undef, n), Vector{Float64}(undef, n)
-    for i = 1:n
+    for i in 1:n
         ind, p = sample(rng, t)
         inds[i] = ind
         priorities[i] = p

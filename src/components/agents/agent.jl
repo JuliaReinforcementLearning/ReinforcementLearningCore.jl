@@ -68,7 +68,12 @@ end
 # Union{CircularCompactSARTSATrajectory, CircularCompactPSARTSATrajectory}
 #####
 
-function (agent::Agent{<:AbstractPolicy,<:Union{CircularCompactSARTSATrajectory, CircularCompactPSARTSATrajectory}})(
+function (
+    agent::Agent{
+        <:AbstractPolicy,
+        <:Union{CircularCompactSARTSATrajectory,CircularCompactPSARTSATrajectory},
+    }
+)(
     ::PreEpisodeStage,
     obs,
 )
@@ -78,7 +83,12 @@ function (agent::Agent{<:AbstractPolicy,<:Union{CircularCompactSARTSATrajectory,
     nothing
 end
 
-function (agent::Agent{<:AbstractPolicy,<:Union{CircularCompactSARTSATrajectory, CircularCompactPSARTSATrajectory}})(
+function (
+    agent::Agent{
+        <:AbstractPolicy,
+        <:Union{CircularCompactSARTSATrajectory,CircularCompactPSARTSATrajectory},
+    }
+)(
     ::PreActStage,
     obs,
 )
@@ -88,7 +98,12 @@ function (agent::Agent{<:AbstractPolicy,<:Union{CircularCompactSARTSATrajectory,
     action
 end
 
-function (agent::Agent{<:AbstractPolicy,<:Union{CircularCompactSARTSATrajectory, CircularCompactPSARTSATrajectory}})(
+function (
+    agent::Agent{
+        <:AbstractPolicy,
+        <:Union{CircularCompactSARTSATrajectory,CircularCompactPSARTSATrajectory},
+    }
+)(
     ::PostActStage,
     obs,
 )
@@ -96,7 +111,12 @@ function (agent::Agent{<:AbstractPolicy,<:Union{CircularCompactSARTSATrajectory,
     nothing
 end
 
-function (agent::Agent{<:AbstractPolicy,<:Union{CircularCompactSARTSATrajectory, CircularCompactPSARTSATrajectory}})(
+function (
+    agent::Agent{
+        <:AbstractPolicy,
+        <:Union{CircularCompactSARTSATrajectory,CircularCompactPSARTSATrajectory},
+    }
+)(
     ::PostEpisodeStage,
     obs,
 )

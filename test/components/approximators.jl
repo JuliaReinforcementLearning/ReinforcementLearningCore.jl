@@ -11,10 +11,7 @@
     end
 
     @testset "NeuralNetworkApproximator" begin
-        NN = NeuralNetworkApproximator(
-            ;model = Dense(2,3),
-            optimizer = Descent()
-        )
+        NN = NeuralNetworkApproximator(; model = Dense(2, 3), optimizer = Descent())
 
         q_values = NN(rand(2))
         @test size(q_values) == (3,)

@@ -54,14 +54,14 @@
 
         @test capacity(t) == 8
 
-        for i = 1:4
+        for i in 1:4
             push!(t, i)
         end
 
         @test length(t) == 4
         @test size(t) == (4,)
 
-        for i = 5:16
+        for i in 5:16
             push!(t, i)
         end
 
