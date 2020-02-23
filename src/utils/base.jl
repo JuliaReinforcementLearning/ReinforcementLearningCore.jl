@@ -1,4 +1,4 @@
-export select_last_dim, select_last_frame, consecutive_view, find_all_max, find_max, huber_loss, discount_rewards, discount_rewards!, discount_rewards_reduced
+export select_last_dim, select_last_frame, consecutive_view, find_all_max, find_max, huber_loss,  huber_loss_unreduced, discount_rewards, discount_rewards!, discount_rewards_reduced
 
 using StatsBase
 
@@ -119,12 +119,14 @@ function find_max(A, mask)
     maxval, ind
 end
 
-function huber_loss(labels, predictions;δ = 1.0f0)
+function huber_loss_unreduced(labels, predictions;δ = 1.0f0)
     abs_error = abs.(predictions .- labels)
     quadratic = min.(abs_error, 1.0f0)  # quadratic = min.(abs_error, δ)
     linear = abs_error .- quadratic
-    mean(0.5f0 .* quadratic .* quadratic .+ linear)  # 0.5f0 .* quadratic .* quadratic .+ δ .* linear
+    0.5f0 .* quadratic .* quadratic .+ linear  # 0.5f0 .* quadratic .* quadratic .+ δ .* linear
 end
+
+huber_loss(labels, predictions;δ = 1.0f0) = huber_loss_unreduced(labels, predictions;δ=δ) |> mean
 
 function discount_rewards!(new_rewards, rewards, γ)
     new_rewards[end] = rewards[end]

@@ -50,17 +50,15 @@ function Base.push!(b::CompactSARTSATrajectory, kv::Pair{Symbol})
     b
 end
 
-function Base.pop!(t::CompactSARTSATrajectory, traces::Symbol...)
-    for s in traces
-        if s == :state || s == :next_state
-            pop!(t[:state])
-        elseif s == :action || s == :next_action
-            pop!(t[:action])
-        elseif s == :reward || s == :terminal
-            pop!(t[s])
-        else
-            throw(ArgumentError("unknown trace name: $s"))
-        end
+function Base.pop!(t::CompactSARTSATrajectory, s::Symbol)
+    if s == :state || s == :next_state
+        pop!(t[:state])
+    elseif s == :action || s == :next_action
+        pop!(t[:action])
+    elseif s == :reward || s == :terminal
+        pop!(t[s])
+    else
+        throw(ArgumentError("unknown trace name: $s"))
     end
     t
 end
