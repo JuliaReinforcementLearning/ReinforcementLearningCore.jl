@@ -69,6 +69,16 @@ function (s::StopAfterStep{Progress})(args...)
     res
 end
 
+function (s::StopAfterStep{Progress})(agent, env::MultiThreadEnv, obs::BatchObs)
+    res = s.cur >= s.step
+    s.cur += length(obs)
+
+    ProgressMeter.update!(s.progress, s.cur)
+    @debug s.tag STEP = s.cur
+
+    res
+end
+
 #####
 # StopAfterEpisode
 #####
@@ -103,15 +113,15 @@ function (s::StopAfterEpisode{Nothing})(agent, env, obs)
 end
 
 function (s::StopAfterEpisode{Progress})(agent, env, obs)
-    # https://github.com/timholy/ProgressMeter.jl/pull/131
-    # next!(s.progress; showvalues = [(Symbol(s.tag, "/", :EPISODE), s.cur)])
-    next!(s.progress;)
     @debug s.tag EPISODE = s.cur
 
     is_terminal = get_num_players(env) == 1 ? get_terminal(obs) : get_terminal(obs[1])
 
     if is_terminal
         s.cur += 1
+        # https://github.com/timholy/ProgressMeter.jl/pull/131
+        # next!(s.progress; showvalues = [(Symbol(s.tag, "/", :EPISODE), s.cur)])
+        next!(s.progress;)
     end
 
     s.cur >= s.episode

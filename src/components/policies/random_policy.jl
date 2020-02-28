@@ -22,6 +22,7 @@ function (p::RandomPolicy)(obs, ::FullActionSet)
 end
 
 (p::RandomPolicy)(obs, ::MinimalActionSet) = rand(p.rng, p.action_space)
+(p::RandomPolicy)(obs::BatchObs, ::MinimalActionSet) = [rand(p.rng, p.action_space) for _ in 1:length(obs)]
 
 RLBase.update!(p::RandomPolicy, experience) = nothing
 
