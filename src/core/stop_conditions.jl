@@ -64,19 +64,6 @@ function (s::StopAfterStep)(args...)
     res
 end
 
-function (s::StopAfterStep)(agent, env::MultiThreadEnv, obs::BatchObs)
-    res = s.cur >= s.step
-    s.cur += length(obs)
-
-    if !isnothing(s.progress)
-        ProgressMeter.update!(s.progress, s.cur)
-    end
-
-    @debug s.tag STEP = s.cur
-
-    res
-end
-
 #####
 # StopAfterEpisode
 #####
