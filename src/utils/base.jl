@@ -8,8 +8,8 @@ export select_last_dim,
     discount_rewards,
     discount_rewards!,
     discount_rewards_reduced,
-    gae_returns,
-    gae_returns!,
+    general_advantage_estimation,
+    general_advantage_estimation!,
     logitcrossentropy_unreduced,
     flatten_batch,
     unflatten_batch
@@ -389,7 +389,7 @@ function _discount_rewards_reduced!(reduced_rewards, rewards, γ, terminal, init
 end
 
 """
-    gae_returns(rewards::VectorOrMatrix, values::VectorOrMatrix, γ::Number, λ::Number;kwargs...)
+    general_advantage_estimation(rewards::VectorOrMatrix, values::VectorOrMatrix, γ::Number, λ::Number;kwargs...)
 
 Calculate the generalized advantage estimate started from the current step with discount rate of `γ` and a lambda for GAE-Lambda of 'λ'.
 `rewards` and 'values' can be a matrix.
@@ -401,17 +401,17 @@ Calculate the generalized advantage estimate started from the current step with 
 
 # Example
 """
-function gae_returns(rewards::VectorOrMatrix, values::VectorOrMatrix, γ::T, λ::T; kwargs...) where {T<:Number}
+function general_advantage_estimation(rewards::VectorOrMatrix, values::VectorOrMatrix, γ::T, λ::T; kwargs...) where {T<:Number}
     res = similar(rewards, promote_type(eltype(rewards), T))
-    gae_returns!(res, rewards, values, γ, λ; kwargs...)
+    general_advantage_estimation!(res, rewards, values, γ, λ; kwargs...)
     res
 end
 
-gae_returns!(new_rewards, rewards, values, γ, λ; terminal = nothing, dims = :) =
-    _gae_returns!(new_rewards, rewards, values, γ, λ, terminal, dims)
+general_advantage_estimation!(advantages, rewards, values, γ, λ; terminal = nothing, dims = :) =
+    _general_advantage_estimation!(advantages, rewards, values, γ, λ, terminal, dims)
 
-function _gae_returns!(
-    new_rewards::AbstractMatrix,
+function _general_advantage_estimation!(
+    advantages::AbstractMatrix,
     rewards::AbstractMatrix,
     values::AbstractMatrix,
     γ,
@@ -420,14 +420,14 @@ function _gae_returns!(
     dims::Int,
 )
     dims = ndims(rewards) - dims + 1
-    for (r′, r, v) in zip(eachslice(new_rewards, dims = dims), eachslice(rewards, dims = dims), eachslice(values,dims=dims))
-        _gae_returns!(r′, r, v, γ, λ, nothing)
+    for (r′, r, v) in zip(eachslice(advantages, dims = dims), eachslice(rewards, dims = dims), eachslice(values,dims=dims))
+        _general_advantage_estimation!(r′, r, v, γ, λ, nothing)
     end
 end
 
 
-function _gae_returns!(
-    new_rewards::AbstractMatrix,
+function _general_advantage_estimation!(
+    advantages::AbstractMatrix,
     rewards::AbstractMatrix,
     values::AbstractMatrix,
     γ,
@@ -437,34 +437,34 @@ function _gae_returns!(
 )
     dims = ndims(rewards) - dims + 1
     for (r′, r, v, t) in zip(
-        eachslice(new_rewards, dims = dims),
+        eachslice(advantages, dims = dims),
         eachslice(rewards, dims = dims),
         eachslice(values, dims = dims),
         eachslice(terminal, dims = dims),
     )
-        _gae_returns!(r′, r, v, γ, λ, t)
+        _general_advantage_estimation!(r′, r, v, γ, λ, t)
     end
 end
 
-_gae_returns!(
-    new_rewards::AbstractVector,
+_general_advantage_estimation!(
+    advantages::AbstractVector,
     rewards::AbstractVector,
     values::AbstractVector,
     γ,
     λ,
     terminal,
     dims::Colon,
-) = _gae_returns!(new_rewards, rewards, values, γ, λ, terminal)
+) = _general_advantage_estimation!(advantages, rewards, values, γ, λ, terminal)
 
 
-"assuming rewards and new_rewards are Vector"
-function _gae_returns!(new_rewards, rewards, values, γ, λ, terminal)
+"assuming rewards and advantages are Vector"
+function _general_advantage_estimation!(advantages, rewards, values, γ, λ, terminal)
     gae = 0
     for i in length(rewards):-1:1
         is_continue = isnothing(terminal) ? true : (!terminal[i])
         delta = rewards[i] + γ * values[i+1] * is_continue - values[i]
         gae = delta + γ*λ*is_continue*gae
-        new_rewards[i] = gae
+        advantages[i] = gae
     end
-    new_rewards
+    advantages
 end
