@@ -69,10 +69,10 @@ function Base.pop!(t::CompactSARTSATrajectory)
     else
         NamedTuple{RTSA}(
             (
-                pop!(t, :state),
-                pop!(t, :action),
                 pop!(t, :reward),
                 pop!(t, :terminal),
+                pop!(t, :state),
+                pop!(t, :action),
             )
         )
     end
