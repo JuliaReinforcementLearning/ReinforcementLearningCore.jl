@@ -81,6 +81,5 @@ function Base.pop!(t::CircularCompactPSARTSATrajectory, s::Symbol)
 end
 
 function Base.pop!(t::CircularCompactPSARTSATrajectory)
-    pop!(t.priority)
-    pop!(t.trajectory)
+    (priority=pop!(t.priority), pop!(t.trajectory)...)
 end
