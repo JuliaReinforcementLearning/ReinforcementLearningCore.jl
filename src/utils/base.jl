@@ -8,6 +8,8 @@ export select_last_dim,
     discount_rewards,
     discount_rewards!,
     discount_rewards_reduced,
+    gae_returns,
+    gae_returns!,
     logitcrossentropy_unreduced,
     flatten_batch,
     unflatten_batch
@@ -384,4 +386,85 @@ function _discount_rewards_reduced!(reduced_rewards, rewards, γ, terminal, init
         enumerate(zip(eachslice(rewards, dims = dims), eachslice(terminal, dims = dims)))
         reduced_rewards[i] = _discount_rewards_reduced(r, γ, t, init[i])
     end
+end
+
+"""
+    gae_returns(rewards::VectorOrMatrix, values::VectorOrMatrix, γ::Number, λ::Number;kwargs...)
+
+Calculate the generalized advantage estimate started from the current step with discount rate of `γ` and a lambda for GAE-Lambda of 'λ'.
+`rewards` and 'values' can be a matrix.
+
+# Keyword argments
+
+- `dims=:`, if `rewards` is a `Matrix`, then `dims` can only be `1` or `2`.
+- `terminal=nothing`, specify if each reward follows by a terminal. `nothing` means the game is not terminated yet. If `terminal` is provided, then the size must be the same with `rewards`.
+
+# Example
+"""
+function gae_returns(rewards::VectorOrMatrix, values::VectorOrMatrix, γ::T, λ::T; kwargs...) where {T<:Number}
+    res = similar(rewards, promote_type(eltype(rewards), T))
+    gae_returns!(res, rewards, values, γ, λ; kwargs...)
+    res
+end
+
+gae_returns!(new_rewards, rewards, values, γ, λ; terminal = nothing, dims = :) =
+    _gae_returns!(new_rewards, rewards, values, γ, λ, terminal, dims)
+
+function _gae_returns!(
+    new_rewards::AbstractMatrix,
+    rewards::AbstractMatrix,
+    values::AbstractMatrix,
+    γ,
+    λ,
+    terminal::Nothing,
+    dims::Int,
+)
+    dims = ndims(rewards) - dims + 1
+    for (r′, r, v) in zip(eachslice(new_rewards, dims = dims), eachslice(rewards, dims = dims), eachslice(values,dims=dims))
+        _gae_returns!(r′, r, v, γ, λ, nothing)
+    end
+end
+
+
+function _gae_returns!(
+    new_rewards::AbstractMatrix,
+    rewards::AbstractMatrix,
+    values::AbstractMatrix,
+    γ,
+    λ,
+    terminal,
+    dims::Int,
+)
+    dims = ndims(rewards) - dims + 1
+    for (r′, r, v, t) in zip(
+        eachslice(new_rewards, dims = dims),
+        eachslice(rewards, dims = dims),
+        eachslice(values, dims = dims),
+        eachslice(terminal, dims = dims),
+    )
+        _gae_returns!(r′, r, v, γ, λ, t)
+    end
+end
+
+_gae_returns!(
+    new_rewards::AbstractVector,
+    rewards::AbstractVector,
+    values::AbstractVector,
+    γ,
+    λ,
+    terminal,
+    dims::Colon,
+) = _gae_returns!(new_rewards, rewards, values, γ, λ, terminal)
+
+
+"assuming rewards and new_rewards are Vector"
+function _gae_returns!(new_rewards, rewards, values, γ, λ, terminal)
+    gae = 0
+    for i in length(rewards):-1:1
+        is_continue = isnothing(terminal) ? true : (!terminal[i])
+        delta = rewards[i] + γ * values[i+1] * is_continue - values[i]
+        gae = delta + γ*λ*is_continue*gae
+        new_rewards[i] = gae
+    end
+    new_rewards
 end
