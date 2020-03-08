@@ -169,42 +169,42 @@
         ) ≈ [3.0, 2.0, 6.0]
     end
 
-    @testset "general_advantage_estimation" begin
+    @testset "generalized_advantage_estimation" begin
         reward, values, γ, λ = [1.0], [2.0, 3.0], 0.5, 0.3
-        @test general_advantage_estimation(reward, values, γ, λ) ≈ [0.5]
+        @test generalized_advantage_estimation(reward, values, γ, λ) ≈ [0.5]
 
         reward, values, γ, λ = [1.0, 1.0], [1 , 2, 3] , 0.5, 0.3
-        @test general_advantage_estimation(reward, values, γ, λ) ≈ [1.075, 0.5]
+        @test generalized_advantage_estimation(reward, values, γ, λ) ≈ [1.075, 0.5]
 
         reward, values, γ, λ = Float64[1, 2, 3], [1,2,3,4], 0.5, 0.3
-        @test general_advantage_estimation(reward, values, γ, λ) ≈ [1.27, 1.8, 2]
+        @test generalized_advantage_estimation(reward, values, γ, λ) ≈ [1.27, 1.8, 2]
 
-        @test general_advantage_estimation(reward, values, γ, λ; terminal = [true false true]) ≈
+        @test generalized_advantage_estimation(reward, values, γ, λ; terminal = [true false true]) ≈
               [0.0, 1.5, 0.0]
 
         # type stable
         reward, values, γ, λ = [1, 2, 3], [1,2,3,4], 0.5f0, 0.5f0
-        @test eltype(general_advantage_estimation(reward, values, γ, λ)) == Float32
+        @test eltype(generalized_advantage_estimation(reward, values, γ, λ)) == Float32
 
         # 2D
         reward, values, γ, λ = reshape(1:9, 3, 3), reshape(1:12, 4, 3), 0.5, 0.3
         # for 2d rewards, the keyword argument of `dim` must be either `1` or `2`
-        @test_throws MethodError general_advantage_estimation(reward, values, γ, λ)
-        @test general_advantage_estimation(reward, values, γ, λ; dims = 1) ≈
+        @test_throws MethodError generalized_advantage_estimation(reward, values, γ, λ)
+        @test generalized_advantage_estimation(reward, values, γ, λ; dims = 1) ≈
               [1.27 2.4425 3.615; 1.8 2.95 4.1; 2.0 3.0 4.0]
 
         values = reshape(1:12, 3, 4)
-        @test general_advantage_estimation(reward, values, γ, λ; dims = 2) ≈
+        @test generalized_advantage_estimation(reward, values, γ, λ; dims = 2) ≈
               [2.6375 4.25 5.0; 3.22375 4.825 5.5; 3.81 5.4 6.0]
 
         reward, values, γ, λ = reshape(1:9, 3, 3), reshape(1:12, 4, 3), 0.5, 0.3
         terminal = [false true false; true false true; false true false;]
 
-        @test general_advantage_estimation(reward, values, γ, λ; dims = 1, terminal = terminal) ≈
+        @test generalized_advantage_estimation(reward, values, γ, λ; dims = 1, terminal = terminal) ≈
               [1.0 -1.0 2.7; 0.0 2.35 -2.0; 2.0 -1.0 4.0]
 
         values = reshape(1:12,3,4)
-        @test general_advantage_estimation(reward, values, γ, λ; dims = 2) ≈
+        @test generalized_advantage_estimation(reward, values, γ, λ; dims = 2) ≈
               [2.6375 4.25 5.0; 3.22375 4.825 5.5; 3.81 5.4 6.0]
     end
 
