@@ -1,3 +1,5 @@
+export AbstractLearner
+
 """
     (learner::AbstractLearner)(obs)
 
