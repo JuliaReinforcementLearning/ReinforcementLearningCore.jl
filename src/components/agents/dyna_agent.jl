@@ -31,7 +31,7 @@ Base.@kwdef struct DynaAgent{
     plan_step::Int = 10
 end
 
-RLBase.get_role(agent::DynaAgent) = agent.role
+get_role(agent::DynaAgent) = agent.role
 
 function (agent::DynaAgent{<:AbstractPolicy,<:EpisodicCompactSARTSATrajectory})(
     ::PreEpisodeStage,

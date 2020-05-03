@@ -14,4 +14,4 @@ abstract type AbstractApproximator end
 
 Usually the `correction` is the gradient of inner parameters.
 """
-function update!(a::AbstractApproximator, correction) end
+function RLBase.update!(a::AbstractApproximator, correction) end

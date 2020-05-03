@@ -89,14 +89,14 @@ consecutive_view(cb::AbstractArray, inds::Vector{Int}, n_stack::Int, n_horizeon:
         ),
     )
 
-function find_all_max(itr)
+function find_all_max(x)
     v = maximum(x)
     v, findall(==(v), x)
 end
 
-function find_all_max(itr, mask::AbstractVector{Bool})
+function find_all_max(x, mask::AbstractVector{Bool})
     v = maximum(view(x,mask))
-    v, findall(==(v), x)
+    v, [k for (m, k) in zip(mask, keys(x)) if m && x[k]==v]
 end
 
 # !!! watch https://github.com/JuliaLang/julia/pull/35316#issuecomment-622629895

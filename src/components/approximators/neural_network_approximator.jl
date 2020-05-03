@@ -13,7 +13,7 @@ Use a DNN model for value estimation.
 - `optimizer`
 - `parameters=params(model)`
 """
-Base.@kwdef struct NeuralNetworkApproximator{T,M,O,P} <: AbstractApproximator
+Base.@kwdef struct NeuralNetworkApproximator{M,O,P} <: AbstractApproximator
     model::M
     optimizer::O
     params::P = params(model)
