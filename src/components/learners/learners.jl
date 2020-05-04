@@ -1,4 +1,4 @@
-export AbstractLearner
+export AbstractLearner, extract_experience
 
 """
     (learner::AbstractLearner)(obs)
@@ -14,7 +14,12 @@ function (learner::AbstractLearner)(obs) end
 
 Typical `experience` is [`AbstractTrajectory`](@ref).
 """
-function RLBase.update!(learner::AbstractLearner, experience) end
+function RLBase.update!(learner::AbstractLearner, t::AbstractTrajectory)
+    experience = extract_experience(t, learner)
+    isnothing(experience) || update!(learner, experience)
+end
+
+function extract_experience end
 
 """
     get_priority(p::AbstractLearner, experience)

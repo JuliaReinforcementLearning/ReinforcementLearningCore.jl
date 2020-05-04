@@ -47,3 +47,6 @@ function RLBase.update!(Q::TabularApproximator{2}, correction::Pair{Int,Vector{F
         Q.table[a, s] += e
     end
 end
+
+ApproximatorStyle(::TabularApproximator{1}) = V_APPROXIMATOR
+ApproximatorStyle(::TabularApproximator{2}) = Q_APPROXIMATOR

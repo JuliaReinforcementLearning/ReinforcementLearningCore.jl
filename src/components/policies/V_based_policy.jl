@@ -17,6 +17,8 @@ Base.@kwdef struct VBasedPolicy{L<:AbstractLearner,M,E<:AbstractExplorer} <: Abs
     explorer::E = GreedyExplorer()
 end
 
+(p::VBasedPolicy)(obs) = p(obs, ActionStyle(obs))
+
 (p::VBasedPolicy)(obs, ::MinimalActionSet) = p.mapping(obs, p.learner) |> p.explorer
 
 function (p::VBasedPolicy)(obs, ::FullActionSet)

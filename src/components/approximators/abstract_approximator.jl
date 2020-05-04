@@ -1,4 +1,9 @@
-export AbstractApproximator
+export AbstractApproximator,
+    ApproximatorStyle,
+    Q_APPROXIMATOR,
+    QApproximator,
+    V_APPROXIMATOR,
+    VApproximator
 
 """
     (app::AbstractApproximator)(obs)
@@ -15,3 +20,22 @@ abstract type AbstractApproximator end
 Usually the `correction` is the gradient of inner parameters.
 """
 function RLBase.update!(a::AbstractApproximator, correction) end
+
+#####
+# traits
+#####
+
+abstract type AbstractApproximatorStyle end
+
+"""
+Used to detect what an [`AbstractApproximator`](@ref) is approximating.
+"""
+function ApproximatorStyle(::AbstractApproximator) end
+
+struct QApproximator <: AbstractApproximatorStyle end
+
+const Q_APPROXIMATOR = QApproximator()
+
+struct VApproximator <: AbstractApproximatorStyle end
+
+const V_APPROXIMATOR = VApproximator()
