@@ -12,9 +12,4 @@ end
 
 (π::OffPolicy)(obs) = π.π_behavior(obs)
 
-struct WeightedExperience{E, W}
-    experience::E
-    weight::W
-end
-
 @forward OffPolicy.π_behavior RLBase.get_priority, RLBase.get_prob
