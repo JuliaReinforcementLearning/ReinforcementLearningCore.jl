@@ -18,7 +18,7 @@ end
 (π::QBasedPolicy)(obs, ::FullActionSet) =
     π.explorer(π.learner(obs), get_legal_actions_mask(obs))
 
-RLBase.get_prob(p::QBasedPolicy, obs) = get_prob(p, ActionStyle(obs))
+RLBase.get_prob(p::QBasedPolicy, obs) = get_prob(p, obs, ActionStyle(obs))
 RLBase.get_prob(p::QBasedPolicy, obs, ::MinimalActionSet) =
     get_prob(p.explorer, p.learner(obs))
 RLBase.get_prob(p::QBasedPolicy, obs, ::FullActionSet) =

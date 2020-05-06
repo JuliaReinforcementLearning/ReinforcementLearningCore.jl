@@ -27,7 +27,7 @@ Base.@kwdef struct DynaAgent{
     policy::P
     model::M
     trajectory::B
-    role::R = DEFAULT_PLAYER
+    role::R = :DEFAULT_PLAYER
     plan_step::Int = 10
 end
 

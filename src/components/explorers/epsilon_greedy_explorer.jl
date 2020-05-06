@@ -146,11 +146,30 @@ function RLBase.get_prob(s::EpsilonGreedyExplorer{<:Any,true}, values)
     Categorical(probs)
 end
 
+function RLBase.get_prob(s::EpsilonGreedyExplorer{<:Any,true}, values, action::Integer)
+    ϵ, n = get_ϵ(s), length(values)
+    max_val_inds = find_all_max(values)[2]
+    if action in max_val_inds
+        ϵ / n + (1 - ϵ) / length(max_val_inds)
+    else
+        ϵ / n
+    end
+end
+
 function RLBase.get_prob(s::EpsilonGreedyExplorer{<:Any,false}, values)
     ϵ, n = get_ϵ(s), length(values)
     probs = fill(ϵ / n, n)
     probs[findmax(values)[2]] += 1 - ϵ
     Categorical(probs)
+end
+
+function RLBase.get_prob(s::EpsilonGreedyExplorer{<:Any,false}, values, action::Integer)
+    ϵ, n = get_ϵ(s), length(values)
+    if action == findmax(values)[2]
+        ϵ / n + 1 - ϵ
+    else
+        ϵ / n
+    end
 end
 
 function RLBase.get_prob(s::EpsilonGreedyExplorer{<:Any,true}, values, mask)
@@ -186,6 +205,8 @@ function RLBase.get_prob(s::GreedyExplorer, values)
     prob[findmax(values)[2]] = 1.0
     Categorical(prob)
 end
+
+RLBase.get_prob(s::GreedyExplorer, values, action::Integer) = findmax(values)[2] == action ? 1.0 : 0.0
 
 function RLBase.get_prob(s::GreedyExplorer, values, mask)
     prob = zeros(length(values))

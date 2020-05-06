@@ -26,11 +26,19 @@ function (p::VBasedPolicy)(obs, ::FullActionSet)
     p.explorer(action_values, get_legal_actions_mask(obs))
 end
 
+RLBase.get_prob(p::VBasedPolicy, obs, action::Integer) = get_prob(p, obs, ActionStyle(obs), action)
+
 RLBase.get_prob(p::VBasedPolicy, obs, ::MinimalActionSet) = get_prob(p.explorer, p.mapping(obs, p.learner))
+RLBase.get_prob(p::VBasedPolicy, obs, ::MinimalActionSet, action) = get_prob(p.explorer, p.mapping(obs, p.learner), action)
 
 function RLBase.get_prob(p::VBasedPolicy, obs, ::FullActionSet)
     action_values = p.mapping(obs, p.learner)
     get_prob(p.explorer, action_values, get_legal_actions_mask(obs))
+end
+
+function RLBase.get_prob(p::VBasedPolicy, obs, ::FullActionSet, action)
+    action_values = p.mapping(obs, p.learner)
+    get_prob(p.explorer, action_values, get_legal_actions_mask(obs), action)
 end
 
 @forward VBasedPolicy.learner RLBase.get_priority, RLBase.update!
