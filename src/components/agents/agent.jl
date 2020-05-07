@@ -25,7 +25,7 @@ end
 get_role(agent::Agent) = agent.role
 
 function Flux.testmode!(agent::Agent, mode=true)
-    agent.is_training = mode
+    agent.is_training = !mode
     testmode!(agent.policy, mode)
 end
 
