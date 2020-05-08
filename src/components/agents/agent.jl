@@ -53,8 +53,6 @@ function Agent(dir::String)
     Agent(policy, trajectory, role, is_training)
 end
 
-Flux.gpu(agent::Agent) = Agent(gpu(agent.policy), agent.trajectory, agent.role, agent.is_training)
-
 get_role(agent::Agent) = agent.role
 
 function Flux.testmode!(agent::Agent, mode = true)
