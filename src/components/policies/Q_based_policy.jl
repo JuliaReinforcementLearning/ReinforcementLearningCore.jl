@@ -14,6 +14,8 @@ Base.@kwdef struct QBasedPolicy{Q<:AbstractLearner,E<:AbstractExplorer} <: Abstr
     explorer::E
 end
 
+Flux.@functor QBasedPolicy
+
 (π::QBasedPolicy)(obs) = π(obs, ActionStyle(obs))
 (π::QBasedPolicy)(obs, ::MinimalActionSet) = obs |> π.learner |> π.explorer
 (π::QBasedPolicy)(obs, ::FullActionSet) =

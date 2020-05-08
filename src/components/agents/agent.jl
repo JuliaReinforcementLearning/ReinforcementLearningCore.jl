@@ -1,6 +1,9 @@
 export Agent
 
 using Flux
+using BSON
+using JLD2
+using FileIO
 
 """
     Agent(;kwargs...)
@@ -21,6 +24,36 @@ Base.@kwdef mutable struct Agent{P<:AbstractPolicy,T<:AbstractTrajectory,R} <: A
     role::R = :DEFAULT_PLAYER
     is_training::Bool = true
 end
+
+function FileIO.save(dir::String, agent::Agent)
+    mkpath(dir)
+
+    policy = cpu(agent.policy)  # avoid gpu relate problems
+    trajectory = agent.trajectory
+    role = agent.role
+    is_training = agent.is_training
+
+    @info "saving agent to $dir ..."
+    t = @elapsed begin
+        BSON.@save joinpath(dir, "policy.bson") policy
+        JLD2.@save joinpath(dir, "trajectory.jld2") trajectory  # much faster with JLD2
+        BSON.@save joinpath(dir, "role.bson") role
+        BSON.@save joinpath(dir, "is_training.bson") is_training
+    end
+    @info "finished saving agent in $t seconds"
+end
+
+"remember to call `gpu` if necessary"
+function Agent(dir::String)
+    @info "loading agent from $dir"
+    BSON.@load joinpath(dir, "policy.bson") policy
+    JLD2.@load joinpath(dir, "trajectory.jld2") trajectory
+    BSON.@load joinpath(dir, "role.bson") role
+    BSON.@load joinpath(dir, "is_training.bson") is_training
+    Agent(policy, trajectory, role, is_training)
+end
+
+Flux.gpu(agent::Agent) = Agent(gpu(agent.policy), agent.trajectory, agent.role, agent.is_training)
 
 get_role(agent::Agent) = agent.role
 
