@@ -6,7 +6,9 @@ export AbstractHook,
     TotalRewardPerEpisode,
     TotalBatchRewardPerEpisode,
     CumulativeReward,
-    TimePerStep
+    TimePerStep,
+    DoAfterEachEpisode,
+    SaveAgentEveryNEpisode
 
 """
 A hook is called at different stage duiring a [`run`](@ref) to allow users to inject customized runtime logic.
@@ -213,18 +215,34 @@ function (hook::TimePerStep)(::PostActStage, agent, env, obs)
     hook.t = time_ns()
 end
 
-mutable struct SaveAgent <: AbstractHook
-    dir::String
-    freq::Int
-    t::Int
+"""
+    DoAfterEachEpisode(f, n=0)
+
+Execute `f(n, agent, env, obs)` after each episode.
+`n` is the number of episodes.
+"""
+mutable struct DoAfterEachEpisode{F} <: AbstractHook
+    f::F
+    n::Int
 end
 
-SaveAgent(dir, freq) = SaveAgent(dir, freq, 0)
+DoAfterEachEpisode(f) = DoAfterEachEpisode(f, 0)
 
-function (hook::SaveAgent)(::PostEpisodeStage, agent, env, obs)
-    hook.t += 1
-    if hook.t == hook.freq
-        hook.t = 0
-        save(joinpath(hook.dir, string(get_role(agent))), agent)
+function (hook::DoAfterEachEpisode)(::PostEpisodeStage, agent, env, obs)
+    hook.n += 1
+    hook.f(hook.n, agent, env, obs)
+end
+
+"""
+    SaveAgentEveryNEpisode(dir, freq;n=0)
+
+Save agent to `dir` every `freq` episodes.
+`n` is used to set the inner counter of [`DoAfterEachEpisode`](@ref).
+"""
+function SaveAgentEveryNEpisode(dir, freq;n=0)
+    DoAfterEachEpisode(n) do n, agent, env, obs
+        if n % freq == 0
+            save(joinpath(hook.dir, string(get_role(agent)), n), agent)
+        end
     end
 end
