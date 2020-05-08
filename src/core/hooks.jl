@@ -212,3 +212,19 @@ function (hook::TimePerStep)(::PostActStage, agent, env, obs)
     push!(hook.times, (time_ns() - hook.t) / 1e9)
     hook.t = time_ns()
 end
+
+mutable struct SaveAgent <: AbstractHook
+    dir::String
+    freq::Int
+    t::Int
+end
+
+SaveAgent(dir, freq) = SaveAgent(dir, freq, 0)
+
+function (hook::SaveAgent)(::PostEpisodeStage, agent, env, obs)
+    hook.t += 1
+    if hook.t == hook.freq
+        hook.t = 0
+        save(joinpath(hook.dir, string(get_role(agent))), agent)
+    end
+end
