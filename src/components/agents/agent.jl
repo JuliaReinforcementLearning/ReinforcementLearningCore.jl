@@ -2,7 +2,7 @@ export Agent
 
 using Flux
 using BSON
-using JLD2
+using JLD
 using FileIO
 using Setfield
 
@@ -39,7 +39,7 @@ function FileIO.save(dir::String, agent::Agent)
     @info "saving agent to $dir ..."
     t = @elapsed begin
         BSON.@save joinpath(dir, "policy.bson") policy
-        JLD2.@save joinpath(dir, "trajectory.jld2") trajectory  # much faster with JLD2
+        JLD.@save joinpath(dir, "trajectory.jld") trajectory
         BSON.@save joinpath(dir, "role.bson") role
         BSON.@save joinpath(dir, "is_training.bson") is_training
     end
@@ -50,7 +50,7 @@ end
 function Agent(dir::String)
     @info "loading agent from $dir"
     BSON.@load joinpath(dir, "policy.bson") policy
-    JLD2.@load joinpath(dir, "trajectory.jld2") trajectory
+    JLD.@load joinpath(dir, "trajectory.jld") trajectory
     BSON.@load joinpath(dir, "role.bson") role
     BSON.@load joinpath(dir, "is_training.bson") is_training
     Agent(policy, trajectory, role, is_training)
