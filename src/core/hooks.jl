@@ -7,8 +7,8 @@ export AbstractHook,
     TotalBatchRewardPerEpisode,
     CumulativeReward,
     TimePerStep,
-    DoAfterEachEpisode,
-    SaveAgentEveryNEpisode
+    DoEveryNEpisode,
+    DoEveryNStep
 
 """
 A hook is called at different stage duiring a [`run`](@ref) to allow users to inject customized runtime logic.
@@ -216,33 +216,39 @@ function (hook::TimePerStep)(::PostActStage, agent, env, obs)
 end
 
 """
-    DoAfterEachEpisode(f, n=0)
+    DoEveryNStep(f; n=1, t=0)
 
-Execute `f(n, agent, env, obs)` after each episode.
-`n` is the number of episodes.
+Execute `f(agent, env, obs)` every `n` step.
+`t` is a counter of steps.
 """
-mutable struct DoAfterEachEpisode{F} <: AbstractHook
+Base.@kwdef mutable struct DoEveryNStep{F} <: AbstractHook
     f::F
-    n::Int
+    n::Int = 1
+    t::Int = 0
 end
 
-DoAfterEachEpisode(f) = DoAfterEachEpisode(f, 0)
-
-function (hook::DoAfterEachEpisode)(::PostEpisodeStage, agent, env, obs)
-    hook.n += 1
-    hook.f(hook.n, agent, env, obs)
+function (hook::DoEveryNStep)(::PostActStage, agent, env, obs)
+    hook.t += 1
+    if hook.t % hook.n == 0
+        hook.f(agent, env, obs)
+    end
 end
 
 """
-    SaveAgentEveryNEpisode(dir, freq;n=0)
+    DoEveryNEpisode(f; n=1, t=0)
 
-Save agent to `dir` every `freq` episodes.
-`n` is used to set the inner counter of [`DoAfterEachEpisode`](@ref).
+Execute `f(agent, env, obs)` every `n` episode.
+`t` is a counter of steps.
 """
-function SaveAgentEveryNEpisode(dir, freq;n=0)
-    DoAfterEachEpisode(n) do n, agent, env, obs
-        if n % freq == 0
-            save(joinpath(hook.dir, string(get_role(agent)), n), agent)
-        end
+Base.@kwdef mutable struct DoEveryNEpisode{F} <: AbstractHook
+    f::F
+    n::Int = 1
+    t::Int = 0
+end
+
+function (hook::DoEveryNEpisode)(::PostEpisodeStage, agent, env, obs)
+    hook.t += 1
+    if hook.t % hook.n == 0
+        hook.f(agent, env, obs)
     end
 end
