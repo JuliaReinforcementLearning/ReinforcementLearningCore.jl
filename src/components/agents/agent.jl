@@ -4,6 +4,7 @@ using Flux
 using BSON
 using JLD2
 using FileIO
+using Setfield
 
 """
     Agent(;kwargs...)
@@ -24,6 +25,8 @@ Base.@kwdef mutable struct Agent{P<:AbstractPolicy,T<:AbstractTrajectory,R} <: A
     role::R = :DEFAULT_PLAYER
     is_training::Bool = true
 end
+
+Flux.functor(x::Agent) = (policy = x.policy,), y -> @set x.policy = y.policy
 
 function FileIO.save(dir::String, agent::Agent)
     mkpath(dir)
