@@ -1,4 +1,4 @@
-export @experiment_str
+export @experiment_cmd
 
 using BSON
 
@@ -33,7 +33,7 @@ function RLBase.load(dir::String, ::Type{<:Experiment})
     Experiment(agent, env, stop_condition, hook, description)
 end
 
-macro experiment_str(s)
+macro experiment_cmd(s)
     Experiment(s)
 end
 
