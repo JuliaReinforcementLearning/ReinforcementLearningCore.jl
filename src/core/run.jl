@@ -1,24 +1,4 @@
-export @experiment_str
 import Base: run
-
-mutable struct Experiment
-    agent
-    env
-    stop_condition
-    hook
-end
-
-macro experiment_str(s)
-    Experiment(s)
-end
-
-function Experiment(s::String)
-    m = match(r"(?<source>\w+)_(?<method>\w+)_(?<env>\w+)(\((?<game>\w*)\))?", s)
-    isnothing(m) && throw(ArgumentError("invalid format, got $s, expected format is like dopamine_dqn_atari(pong)"))
-    Experiment(Val(Symbol(m[:source])), Val(Symbol(m[:method])), Val(Symbol(m[:env])), m[:game])
-end
-
-run(x::Experiment) = run(x.agent, x.env, x.stop_condition, x.hook)
 
 run(agent, env::AbstractEnv, args...) = run(DynamicStyle(env), agent, env, args...)
 
