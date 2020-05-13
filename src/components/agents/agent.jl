@@ -43,10 +43,10 @@ function save(dir::String, agent::Agent)
     @info "finished saving agent in $t seconds"
 end
 
-function RLBase.load(dir::String, ::Type{<:Agent})
+function load(dir::String, ::Type{<:Agent})
     @info "loading agent from $dir"
     BSON.@load joinpath(dir, "agent_meta.bson") role is_training policy_type
-    policy = RLBase.load(joinpath(dir, "policy.bson"), policy_type)
+    policy = load(joinpath(dir, "policy.bson"), policy_type)
     JLD.@load joinpath(dir, "trajectory.jld") trajectory
     Agent(policy, trajectory, role, is_training)
 end
