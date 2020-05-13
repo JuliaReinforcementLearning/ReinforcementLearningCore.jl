@@ -30,12 +30,12 @@ end
 
 Flux.functor(x::Agent) = (policy = x.policy,), y -> @set x.policy = y.policy
 
-function RLBase.save(dir::String, agent::Agent)
+function save(dir::String, agent::Agent)
     mkpath(dir)
     @info "saving agent to $dir ..."
 
     t = @elapsed begin
-        RLBase.save(joinpath(dir, "policy.bson"), agent.policy)
+        save(joinpath(dir, "policy.bson"), agent.policy)
         JLD.save(joinpath(dir, "trajectory.jld"), "trajectory", agent.trajectory)
         BSON.bson(joinpath(dir, "agent_meta.bson"), Dict(:role => agent.role, :is_training => agent.is_training, :policy_type => typeof(agent.policy)))
     end

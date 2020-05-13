@@ -13,12 +13,12 @@ Random.rand(s::MultiContinuousSpace{<:CuArray}) = rand(CuArrays.CURAND.generator
 Flux.testmode!(p::AbstractPolicy, mode = true) =
     @error "someone forgets to implement this method!!!"
 
-function RLBase.save(f::String, p::AbstractPolicy)
+function save(f::String, p::AbstractPolicy)
     policy = cpu(p)
     BSON.@save f policy
 end
 
-function RLBase.load(f::String, ::Type{<:AbstractPolicy})
+function load(f::String, ::Type{<:AbstractPolicy})
     BSON.@load f policy
     gpu(policy)
 end
