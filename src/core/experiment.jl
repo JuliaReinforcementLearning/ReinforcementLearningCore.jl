@@ -1,6 +1,7 @@
 export @experiment_cmd, Experiment
 
 using BSON
+using Markdown
 
 Base.@kwdef mutable struct Experiment
     agent
@@ -21,6 +22,7 @@ function Experiment(s::String)
 end
 
 function Base.run(x::Experiment)
-    println(x.description)
+    display(Markdown.parse(x.description))
     run(x.agent, x.env, x.stop_condition, x.hook)
+    x
 end
