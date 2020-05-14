@@ -41,7 +41,14 @@ function save(dir::String, agent::Agent;is_save_trajectory=true)
         else
             @warn "trajectory is skipped since you set `is_save_trajectory` to false"
         end
-        BSON.bson(joinpath(dir, "agent_meta.bson"), Dict(:role => agent.role, :is_training => agent.is_training, :policy_type => typeof(agent.policy)))
+        BSON.bson(
+            joinpath(dir, "agent_meta.bson"),
+            Dict(
+                :role => agent.role,
+                :is_training => agent.is_training,
+                :policy_type => typeof(agent.policy),
+            ),
+        )
     end
 
     @info "finished saving agent in $t seconds"
