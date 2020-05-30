@@ -22,3 +22,6 @@ end
     sample(s.rng, Weights(values, one(T)))
 (s::WeightedExplorer{false})(values::AbstractVector) =
     sample(s.rng, Weights(values, sum(values)))
+
+# see discussion https://github.com/hill-a/stable-baselines/issues/819
+Flux.testmode!(p::WeightedExplorer, mode = true) = @warn "trainmode/testmode will not take effect on WeightedExplorer, you may consider switching to GreedyExplorer in testmode" maxlog=1
