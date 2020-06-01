@@ -16,4 +16,5 @@ end
     include("core/core.jl")
     include("components/components.jl")
     include("utils/utils.jl")
+    include("extensions.jl")
 end

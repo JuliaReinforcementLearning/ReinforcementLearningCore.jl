@@ -40,9 +40,7 @@ Flux.testmode!(app::NeuralNetworkApproximator, mode = true) = testmode!(app.mode
 """
     ActorCritic(actor, critic)
 
-The `actor` part must return a **normalized** vector representing the action values, and the `critic` part must return a state value.
-
-TODO: remove the **normalized** restriction!!!
+The `actor` part must return logits (*Do not use softmax in the last layer!*), and the `critic` part must return a state value.
 """
 Base.@kwdef struct ActorCritic{A,C}
     actor::A
