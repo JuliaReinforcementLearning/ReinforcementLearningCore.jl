@@ -1,17 +1,17 @@
-export clip_by_global_norm, global_norm
+export clip_by_global_norm!, global_norm
 
 using Zygote
 
 Zygote.@adjoint argmax(xs; dims = :) = argmax(xs; dims = dims), _ -> nothing
 
-global_norm(gs::Zygote.Grads) = sqrt(sum(mapreduce(x->x^2, +, gs[p]) for p in gs.params.params))
+global_norm(gs::Zygote.Grads, ps::Zygote.Params) = sqrt(sum(mapreduce(x->x^2, +, gs[p]) for p in ps))
 
-function clip_by_global_norm(gs::Zygote.Grads, clip_norm::Float32)
-    gn = global_norm(gs)
+function clip_by_global_norm!(gs::Zygote.Grads, ps::Zygote.Params, clip_norm::Float32)
+    gn = global_norm(gs, ps)
     if clip_norm <= gn
-        for p in gs.params.params
+        for p in ps
             gs[p] .*= clip_norm / max(clip_norm, gn)
         end
     end
-    gs
+    gn
 end
