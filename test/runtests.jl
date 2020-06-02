@@ -6,6 +6,7 @@ using StatsBase
 using Distributions: probs
 using ReinforcementLearningEnvironments
 using Flux
+using Zygote
 using CUDAapi
 
 if has_cuda()
