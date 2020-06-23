@@ -124,7 +124,6 @@ function Base.empty!(t::SumTree)
     t
 end
 
-"!!! this is unsafe, always check the `real_ind`, or you may get bound error in some extreme cases."
 function Base.get(t::SumTree, v)
     parent_ind = 1
     leaf_ind = parent_ind
@@ -142,6 +141,9 @@ function Base.get(t::SumTree, v)
                 parent_ind = right_child_ind
             end
         end
+    end
+    if leaf_ind <= t.nparents
+        leaf_ind += t.capacity
     end
     p = t.tree[leaf_ind]
     ind = leaf_ind - t.nparents
