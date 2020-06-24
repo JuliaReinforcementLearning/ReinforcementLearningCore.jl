@@ -154,10 +154,11 @@ end
 sample(rng::AbstractRNG, t::SumTree{T}) where {T} = get(t, rand(rng, T) * t.tree[1])
 sample(t::SumTree) = sample(Random.GLOBAL_RNG, t)
 
-function sample(rng::AbstractRNG, t::SumTree, n::Int)
+function sample(rng::AbstractRNG, t::SumTree{T}, n::Int) where {T}
     inds, priorities = Vector{Int}(undef, n), Vector{Float64}(undef, n)
     for i in 1:n
-        ind, p = sample(rng, t)
+        v = (i-1+rand(rng,T)) / n
+        ind, p = get(t, v * t.tree[1])
         inds[i] = ind
         priorities[i] = p
     end
