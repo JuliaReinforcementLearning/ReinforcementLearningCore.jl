@@ -178,7 +178,12 @@ function TotalBatchRewardPerEpisode(batch_size::Int; tag = "TRAINING")
     TotalBatchRewardPerEpisode([Float64[] for _ in 1:batch_size], zeros(batch_size), tag)
 end
 
-function (hook::TotalBatchRewardPerEpisode)(::PostActStage, agent, env, obs::BatchObs{T}) where T
+function (hook::TotalBatchRewardPerEpisode)(
+    ::PostActStage,
+    agent,
+    env,
+    obs::BatchObs{T},
+) where {T}
     for i in 1:length(obs)
         if T <: RewardOverriddenObs
             hook.reward[i] += get_reward(obs[i].obs)
@@ -233,7 +238,7 @@ Base.@kwdef struct CumulativeReward <: AbstractHook
     tag::String = "TRAINING"
 end
 
-function (hook::CumulativeReward)(::PostActStage, agent, env, obs::T) where T
+function (hook::CumulativeReward)(::PostActStage, agent, env, obs::T) where {T}
     if T <: RewardOverriddenObs
         r = get_reward(obs.obs)
     else
