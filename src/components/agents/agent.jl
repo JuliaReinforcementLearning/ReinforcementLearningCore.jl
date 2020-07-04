@@ -20,7 +20,7 @@ Generally speaking, it does nothing but update the trajectory and policy appropr
 """
 Base.@kwdef mutable struct Agent{P<:AbstractPolicy,T<:AbstractTrajectory,R} <: AbstractAgent
     policy::P
-    trajectory::T
+    trajectory::T = DummyTrajectory()
     role::R = :DEFAULT_PLAYER
     is_training::Bool = true
 end
@@ -74,6 +74,13 @@ end
 
 (agent::Agent)(::Testing, obs) = nothing
 (agent::Agent)(::Testing{PreActStage}, obs) = agent.policy(obs)
+
+#####
+# DummyTrajectory
+#####
+
+(agent::Agent{<:AbstractPolicy, <:DummyTrajectory})(stage::AbstractStage, obs) = nothing
+(agent::Agent{<:AbstractPolicy, <:DummyTrajectory})(stage::PreActStage, obs) = agent.policy(obs)
 
 #####
 # EpisodicCompactSARTSATrajectory

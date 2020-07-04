@@ -93,7 +93,7 @@ end
 function (s::StopAfterEpisode)(agent, env, obs)
     @debug s.tag EPISODE = s.cur
 
-    is_terminal = get_num_players(env) == 1 ? get_terminal(obs) : get_terminal(obs[1])
+    is_terminal = length(get_players(env)) == 1 ? get_terminal(obs) : get_terminal(obs[1])
 
     if is_terminal
         s.cur += 1

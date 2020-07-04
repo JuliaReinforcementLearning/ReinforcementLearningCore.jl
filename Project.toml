@@ -4,6 +4,7 @@ authors = ["Jun Tian <tianjun.cpp@gmail.com>"]
 version = "0.3.3"
 
 [deps]
+AbstractTrees = "1520ce14-60c1-5f80-bbc7-55ef81b5835c"
 Adapt = "79e6a3ab-5dfb-504d-930d-738a2a938a0e"
 BSON = "fbb218c0-5317-5bc6-957e-2ee96dd4b1f0"
 CUDAapi = "3895d2a7-ec45-59b8-82bb-cfc6a382f9b3"

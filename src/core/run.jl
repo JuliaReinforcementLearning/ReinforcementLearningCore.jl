@@ -142,3 +142,53 @@ function run(
     end
     hooks
 end
+
+function run(
+    ::Simultaneous,
+    agents::Tuple{Vararg{<:AbstractAgent}},
+    env::AbstractEnv,
+    stop_condition,
+    hook = EmptyHook(),
+)
+    reset!(env)
+    observations = [observe(env, get_role(agent)) for agent in agents]
+    hook(PRE_EPISODE_STAGE, agents, env, observations)
+    actions = [agent(obs) for obs in observations]
+    hook(PRE_ACT_STAGE, agents, env, observations, actions)
+
+    while true
+        env(actions)
+
+        for (i, agent) in enumerate(agents)
+            observations[i] = observe(env, get_role(agent))
+        end
+        hook(POST_ACT_STAGE, agents, env, observations)
+
+        if get_terminal(observations[1])
+            for (agent, obs) in zip(agents, observations)
+                agent(POST_EPISODE_STAGE, obs)
+            end
+            hook(POST_EPISODE_STAGE, agents, env, observations)
+
+            stop_condition(agents, env, observations) && break
+
+            reset!(env)
+
+            for (i, agent) in enumerate(agents)
+                observations[i] = observe(env, get_role(agent))
+            end
+            hook(PRE_EPISODE_STAGE, agents, env, observations)
+            for (i, agent) in enumerate(agents)
+                actions[i] = agent(observations[i])
+            end
+            hook(PRE_ACT_STAGE, agents, env, observations, actions)
+        else
+            stop_condition(agents, env, observations) && break
+            for (i, agent) in enumerate(agents)
+                actions[i] = agent(observations[i])
+            end
+            hook(PRE_ACT_STAGE, agents, env, observations, actions)
+        end
+    end
+    hook
+end
