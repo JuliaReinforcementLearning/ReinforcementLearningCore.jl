@@ -7,10 +7,9 @@ using Distributions: probs
 using ReinforcementLearningEnvironments
 using Flux
 using Zygote
-using CUDAapi
 
 if has_cuda()
-    using CuArrays
+    using CUDA
 end
 
 @testset "ReinforcementLearningCore.jl" begin

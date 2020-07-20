@@ -1,7 +1,7 @@
 export device, send_to_host, send_to_device
 
 using Flux
-using CuArrays
+using CUDA
 using Adapt
 
 send_to_host(x) = send_to_device(Val(:cpu), x)
