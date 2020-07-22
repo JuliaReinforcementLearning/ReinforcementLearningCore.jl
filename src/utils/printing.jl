@@ -13,7 +13,8 @@ AT.children(t::StructTree{<:AbstractArray}) = ()
 AT.children(t::Pair{Symbol, <:StructTree}) = children(last(t))
 AT.printnode(io::IO, t::StructTree) = summary(io, t.x)
 
-AT.printnode(io::IO, t::StructTree{<:Number}) = print(io, t.x)
+AT.printnode(io::IO, t::StructTree{<:Union{Number,Symbol}}) = print(io, t.x)
+
 
 function AT.printnode(io::IO, t::StructTree{String})
     s = t.x

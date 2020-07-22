@@ -3,12 +3,16 @@ using Distributions: pdf
 using Random
 using Flux
 using BSON
+using AbstractTrees
+
 
 Random.rand(s::MultiContinuousSpace{<:CuArray}) = rand(CUDA.CURAND.generator(), s)
 
 # avoid fallback silently
 Flux.testmode!(p::AbstractPolicy, mode = true) =
     @error "someone forgets to implement this method!!!"
+
+Base.show(io::IO, p::AbstractPolicy) = AbstractTrees.print_tree(io, StructTree(p))
 
 function save(f::String, p::AbstractPolicy)
     policy = cpu(p)
