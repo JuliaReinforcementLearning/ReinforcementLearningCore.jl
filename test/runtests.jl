@@ -7,10 +7,7 @@ using Distributions: probs
 using ReinforcementLearningEnvironments
 using Flux
 using Zygote
-
-if has_cuda()
-    using CUDA
-end
+using CUDA
 
 @testset "ReinforcementLearningCore.jl" begin
     include("core/core.jl")
