@@ -1,4 +1,4 @@
-export seed_glorot_normal, seed_glorot_uniform, seed_orthogonal
+export orthogonal
 
 import Flux: glorot_uniform, glorot_normal
 

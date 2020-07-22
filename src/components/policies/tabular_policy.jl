@@ -2,6 +2,7 @@ export TabularPolicy
 
 using AbstractTrees
 
+## TODO: Use TabularApproximator
 struct TabularPolicy{S,F,E} <: RLBase.AbstractPolicy
     probs::Dict{S,Vector{Float64}}
     key::F

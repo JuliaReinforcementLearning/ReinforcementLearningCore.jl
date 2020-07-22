@@ -1,3 +1,5 @@
+export StructTree
+
 using AbstractTrees
 
 const AT = AbstractTrees
