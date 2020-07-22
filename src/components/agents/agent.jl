@@ -26,7 +26,7 @@ Base.@kwdef mutable struct Agent{P<:AbstractPolicy,T<:AbstractTrajectory,R} <: A
 end
 
 # avoid polluting trajectory
-(agent::Agent)(obs) = agent.policy(obs)
+(agent::Agent)(env) = agent.policy(env)
 
 Flux.functor(x::Agent) = (policy = x.policy,), y -> @set x.policy = y.policy
 
@@ -69,25 +69,25 @@ function Flux.testmode!(agent::Agent, mode = true)
     testmode!(agent.policy, mode)
 end
 
-(agent::Agent)(stage::AbstractStage, obs) =
-    agent.is_training ? agent(Training(stage), obs) : agent(Testing(stage), obs)
+(agent::Agent)(stage::AbstractStage, env) =
+    agent.is_training ? agent(Training(stage), env) : agent(Testing(stage), env)
 
-(agent::Agent)(::Testing, obs) = nothing
-(agent::Agent)(::Testing{PreActStage}, obs) = agent.policy(obs)
+(agent::Agent)(::Testing, env) = nothing
+(agent::Agent)(::Testing{PreActStage}, env) = agent.policy(env)
 
 #####
 # DummyTrajectory
 #####
 
-(agent::Agent{<:AbstractPolicy, <:DummyTrajectory})(stage::AbstractStage, obs) = nothing
-(agent::Agent{<:AbstractPolicy, <:DummyTrajectory})(stage::PreActStage, obs) = agent.policy(obs)
+(agent::Agent{<:AbstractPolicy, <:DummyTrajectory})(stage::AbstractStage, env) = nothing
+(agent::Agent{<:AbstractPolicy, <:DummyTrajectory})(stage::PreActStage, env) = agent.policy(env)
 
 #####
 # EpisodicCompactSARTSATrajectory
 #####
 function (agent::Agent{<:AbstractPolicy,<:EpisodicCompactSARTSATrajectory})(
     ::Training{PreEpisodeStage},
-    obs,
+    env,
 )
     empty!(agent.trajectory)
     nothing
@@ -95,28 +95,28 @@ end
 
 function (agent::Agent{<:AbstractPolicy,<:EpisodicCompactSARTSATrajectory})(
     ::Training{PreActStage},
-    obs,
+    env,
 )
-    action = agent.policy(obs)
-    push!(agent.trajectory; state = get_state(obs), action = action)
+    action = agent.policy(env)
+    push!(agent.trajectory; state = get_state(env), action = action)
     update!(agent.policy, agent.trajectory)
     action
 end
 
 function (agent::Agent{<:AbstractPolicy,<:EpisodicCompactSARTSATrajectory})(
     ::Training{PostActStage},
-    obs,
+    env,
 )
-    push!(agent.trajectory; reward = get_reward(obs), terminal = get_terminal(obs))
+    push!(agent.trajectory; reward = get_reward(env), terminal = get_terminal(env))
     nothing
 end
 
 function (agent::Agent{<:AbstractPolicy,<:EpisodicCompactSARTSATrajectory})(
     ::Training{PostEpisodeStage},
-    obs,
+    env,
 )
-    action = agent.policy(obs)
-    push!(agent.trajectory; state = get_state(obs), action = action)
+    action = agent.policy(env)
+    push!(agent.trajectory; state = get_state(env), action = action)
     update!(agent.policy, agent.trajectory)
     action
 end
@@ -132,7 +132,7 @@ function (
     }
 )(
     ::Training{PreEpisodeStage},
-    obs,
+    env,
 )
     if length(agent.trajectory) > 0
         pop!(agent.trajectory, :state, :action)
@@ -147,10 +147,10 @@ function (
     }
 )(
     ::Training{PreActStage},
-    obs,
+    env,
 )
-    action = agent.policy(obs)
-    push!(agent.trajectory; state = get_state(obs), action = action)
+    action = agent.policy(env)
+    push!(agent.trajectory; state = get_state(env), action = action)
     update!(agent.policy, agent.trajectory)
     action
 end
@@ -162,9 +162,9 @@ function (
     }
 )(
     ::Training{PostActStage},
-    obs,
+    env,
 )
-    push!(agent.trajectory; reward = get_reward(obs), terminal = get_terminal(obs))
+    push!(agent.trajectory; reward = get_reward(env), terminal = get_terminal(env))
     nothing
 end
 
@@ -175,10 +175,10 @@ function (
     }
 )(
     ::Training{PostEpisodeStage},
-    obs,
+    env,
 )
-    action = agent.policy(obs)
-    push!(agent.trajectory; state = get_state(obs), action = action)
+    action = agent.policy(env)
+    push!(agent.trajectory; state = get_state(env), action = action)
     update!(agent.policy, agent.trajectory)
     action
 end
@@ -189,7 +189,7 @@ end
 
 function (agent::Agent{<:AbstractPolicy,<:VectorialCompactSARTSATrajectory})(
     ::Training{PreEpisodeStage},
-    obs,
+    env,
 )
     if length(agent.trajectory) > 0
         pop!(agent.trajectory, :state, :action)
@@ -199,28 +199,28 @@ end
 
 function (agent::Agent{<:AbstractPolicy,<:VectorialCompactSARTSATrajectory})(
     ::Training{PreActStage},
-    obs,
+    env,
 )
-    action = agent.policy(obs)
-    push!(agent.trajectory; state = get_state(obs), action = action)
+    action = agent.policy(env)
+    push!(agent.trajectory; state = get_state(env), action = action)
     update!(agent.policy, agent.trajectory)
     action
 end
 
 function (agent::Agent{<:AbstractPolicy,<:VectorialCompactSARTSATrajectory})(
     ::Training{PostActStage},
-    obs,
+    env,
 )
-    push!(agent.trajectory; reward = get_reward(obs), terminal = get_terminal(obs))
+    push!(agent.trajectory; reward = get_reward(env), terminal = get_terminal(env))
     nothing
 end
 
 function (agent::Agent{<:AbstractPolicy,<:VectorialCompactSARTSATrajectory})(
     ::Training{PostEpisodeStage},
-    obs,
+    env,
 )
-    action = agent.policy(obs)
-    push!(agent.trajectory; state = get_state(obs), action = action)
+    action = agent.policy(env)
+    push!(agent.trajectory; state = get_state(env), action = action)
     update!(agent.policy, agent.trajectory)
     action
 end
