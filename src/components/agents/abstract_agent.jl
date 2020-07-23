@@ -74,5 +74,5 @@ Training(s::T) where {T<:AbstractStage} = Training{T}()
 struct Testing{T<:AbstractStage} end
 Testing(s::T) where {T<:AbstractStage} = Testing{T}()
 
-Base.show(io::IO, agent::AbstractAgent) = AbstractTrees.print_tree(io, StructTree(agent))
+Base.show(io::IO, agent::AbstractAgent) = AbstractTrees.print_tree(io, StructTree(agent),15)
 Base.summary(io::IO, agent::T) where {T<:AbstractAgent} = print(io, T.name)

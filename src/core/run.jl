@@ -31,11 +31,11 @@ function run(
             reset!(env)
             agent(PRE_EPISODE_STAGE, env)
             hook(PRE_EPISODE_STAGE, agent, env)
-            action = agent(PRE_ACT_STAGE)
+            action = agent(PRE_ACT_STAGE, env)
             hook(PRE_ACT_STAGE, agent, env, action)
         else
             stop_condition(agent, env) && break
-            action = agent(PRE_ACT_STAGE)
+            action = agent(PRE_ACT_STAGE, env)
             hook(PRE_ACT_STAGE, agent, env, action)
         end
     end

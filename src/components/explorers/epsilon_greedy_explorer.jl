@@ -23,7 +23,7 @@ Two kinds of epsilon-decreasing strategy are implmented here (`linear` and `exp`
 - `decay_steps::Int=0`: the number of steps for epsilon to decay from `ϵ_init` to `ϵ_stable`.
 - `ϵ_stable::Float64`: the epsilon after `warmup_steps + decay_steps`.
 - `is_break_tie=false`: randomly select an action of the same maximum values if set to `true`.
-- `seed=nothing`: set the seed of internal RNG.
+- `rng=Random.GLOBAL_RNG`: set the internal RNG.
 - `is_training=true`, in training mode, `step` will not be updated. And the `ϵ` will be set to 0.
 
 # Example
@@ -59,9 +59,8 @@ function EpsilonGreedyExplorer(;
     step = 1,
     is_break_tie = false,
     is_training = true,
-    seed = nothing,
+    rng = Random.GLOBAL_RNG
 )
-    rng = MersenneTwister(seed)
     EpsilonGreedyExplorer{kind,is_break_tie,typeof(rng)}(
         ϵ_stable,
         ϵ_init,

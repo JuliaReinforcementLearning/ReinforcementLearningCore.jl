@@ -3,6 +3,7 @@ export device, send_to_host, send_to_device
 using Flux
 using CUDA
 using Adapt
+using Random
 
 import CUDA:device
 
@@ -26,6 +27,14 @@ device(::CuArray) = Val(:gpu)
 device(::Array) = Val(:cpu)
 device(x::Tuple{}) = nothing
 device(x::NamedTuple{(),Tuple{}}) = nothing
+
+function device(x::Random.AbstractRNG)
+    if x isa CUDA.CURAND.RNG
+        Val(:gpu)
+    else
+        Val(:cpu)
+    end
+end
 
 function device(x::Union{Tuple,NamedTuple})
     d1 = device(x[1])

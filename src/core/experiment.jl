@@ -11,6 +11,11 @@ Base.@kwdef mutable struct Experiment
     description::String
 end
 
+function Base.show(io::IO, x::Experiment)
+    display(Markdown.parse(x.description))
+    AbstractTrees.print_tree(io, StructTree(x),15)
+end
+
 macro experiment_cmd(s)
     Experiment(s)
 end
@@ -33,7 +38,6 @@ function Experiment(s::String)
 end
 
 function Base.run(x::Experiment)
-    display(Markdown.parse(x.description))
     run(x.agent, x.env, x.stop_condition, x.hook)
     x
 end

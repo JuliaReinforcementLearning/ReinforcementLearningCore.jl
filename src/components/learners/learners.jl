@@ -9,6 +9,8 @@ A learner is usually used to estimate state values, state-action values or distr
 """
 abstract type AbstractLearner end
 
+Base.summary(io::IO, t::T) where T<:AbstractLearner = print(io, T.name)
+
 function (learner::AbstractLearner)(env) end
 
 """

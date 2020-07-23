@@ -6,7 +6,7 @@ struct ChancePlayerPolicy <: AbstractPolicy
     rng::AbstractRNG
 end
 
-ChancePlayerPolicy(;seed=nothing) = ChancePlayerPolicy(MersenneTwister(seed))
+ChancePlayerPolicy(;rng=Random.GLOBAL_RNG) = ChancePlayerPolicy(rng)
 
 function (p::ChancePlayerPolicy)(env)
     v = rand(p.rng)
