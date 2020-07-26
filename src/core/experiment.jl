@@ -13,7 +13,7 @@ end
 
 function Base.show(io::IO, x::Experiment)
     display(Markdown.parse(x.description))
-    AbstractTrees.print_tree(io, StructTree(x),15)
+    AbstractTrees.print_tree(io, StructTree(x),get(io, :max_depth, 15))
 end
 
 macro experiment_cmd(s)

@@ -41,7 +41,7 @@ end
 
 function StopAfterStep(step; cur = 1, is_show_progress = true)
     if is_show_progress
-        progress = Progress(step)
+        progress = Progress(step, 1)
         ProgressMeter.update!(progress, cur)
     else
         progress = nothing
@@ -80,7 +80,7 @@ end
 
 function StopAfterEpisode(episode; cur = 0, is_show_progress = true)
     if is_show_progress
-        progress = Progress(episode)
+        progress = Progress(episode, 1)
         ProgressMeter.update!(progress, cur)
     else
         progress = nothing

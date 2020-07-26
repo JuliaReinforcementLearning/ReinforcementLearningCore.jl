@@ -23,13 +23,13 @@ function AT.printnode(io::IO, t::StructTree{String})
     i = findfirst('\n', s)
     if isnothing(i)
         if length(s) > 79
-            print(io, "\"s[1:79]...\"")
+            print(io, "\"$(s[1:79])...\"")
         else
             print(io, "\"$s\"")
         end
     else
         if i > 79
-            print(io, "\"s[1:79]...\"")
+            print(io, "\"$(s[1:79])...\"")
         else
             print(io, "\"$(s[1:i-1])...\"")
         end
