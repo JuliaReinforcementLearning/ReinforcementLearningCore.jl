@@ -38,6 +38,7 @@ function Experiment(s::String)
 end
 
 function Base.run(x::Experiment)
+    display(Markdown.parse(x.description))
     run(x.agent, x.env, x.stop_condition, x.hook)
     x
 end

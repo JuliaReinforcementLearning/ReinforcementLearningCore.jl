@@ -197,8 +197,6 @@ function RLBase.get_prob(s::EpsilonGreedyExplorer{<:Any,false}, values, mask)
     Categorical(probs)
 end
 
-RLBase.reset!(s::EpsilonGreedyExplorer) = s.step = 1
-
 # Though we can achieve the same goal by setting the ϵ of [`EpsilonGreedyExplorer`](@ref) to 0,
 # the GreedyExplorer is much faster.
 struct GreedyExplorer <: AbstractExplorer end
