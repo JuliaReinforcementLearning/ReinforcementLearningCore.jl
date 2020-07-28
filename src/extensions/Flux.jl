@@ -31,5 +31,3 @@ end
 
 orthogonal(dims...) = orthogonal(Random.GLOBAL_RNG, dims...)
 orthogonal(rng::AbstractRNG) = (dims...) -> orthogonal(rng, dims...)
-
-Base.summary(io::IO, t::T) where T<:Flux.Chain = print(io, T.name)

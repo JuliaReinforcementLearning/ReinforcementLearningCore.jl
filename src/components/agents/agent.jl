@@ -16,12 +16,12 @@ Generally speaking, it does nothing but update the trajectory and policy appropr
 
 - `policy`::[`AbstractPolicy`](@ref): the policy to use
 - `trajectory`::[`AbstractTrajectory`](@ref): used to store transitions between an agent and an environment
-- `role=:DEFAULT_PLAYER`: used to distinguish different agents
+- `role=RLBase.DEFAULT_PLAYER`: used to distinguish different agents
 """
 Base.@kwdef mutable struct Agent{P<:AbstractPolicy,T<:AbstractTrajectory,R} <: AbstractAgent
     policy::P
     trajectory::T = DummyTrajectory()
-    role::R = :DEFAULT_PLAYER
+    role::R = RLBase.DEFAULT_PLAYER
     is_training::Bool = true
 end
 

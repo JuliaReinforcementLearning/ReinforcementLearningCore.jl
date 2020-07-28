@@ -10,8 +10,6 @@ kinds of approximate methods (for example DNN provided by Flux or Knet).
 """
 abstract type AbstractApproximator end
 
-Base.summary(io::IO, t::T) where T<:AbstractApproximator = print(io, T.name)
-
 """
     update!(a::AbstractApproximator, correction)
 

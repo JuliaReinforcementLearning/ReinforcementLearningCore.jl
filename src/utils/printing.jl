@@ -11,12 +11,12 @@ struct StructTree{X}
 end
 
 AT.children(t::StructTree{X}) where X = Tuple(f => StructTree(getfield(t.x, f)) for f in fieldnames(X))
-AT.children(t::StructTree{T}) where T<:Union{AbstractArray, MersenneTwister, ProgressMeter.Progress} = ()
+AT.children(t::StructTree{T}) where T<:Union{AbstractArray, MersenneTwister, ProgressMeter.Progress, Function} = ()
 AT.children(t::Pair{Symbol, <:StructTree}) = children(last(t))
-AT.printnode(io::IO, t::StructTree) = summary(io, t.x)
-
 AT.printnode(io::IO, t::StructTree{<:Union{Number,Symbol}}) = print(io, t.x)
 
+AT.printnode(io::IO, t::StructTree{T}) where T = print(io, T.name)
+AT.printnode(io::IO, t::StructTree{<:AbstractArray}) where T = summary(io, t.x)
 
 function AT.printnode(io::IO, t::StructTree{String})
     s = t.x

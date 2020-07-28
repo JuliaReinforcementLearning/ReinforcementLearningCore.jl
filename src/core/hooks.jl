@@ -41,8 +41,6 @@ struct ComposedHook{T<:Tuple} <: AbstractHook
     ComposedHook(hooks...) = new{typeof(hooks)}(hooks)
 end
 
-Base.summary(io::IO, hook::ComposedHook) = print(io, "ComposedHook")
-
 function (hook::ComposedHook)(stage::AbstractStage, args...; kw...)
     for h in hook.hooks
         h(stage, args...; kw...)
