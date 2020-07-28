@@ -12,7 +12,7 @@ Random.rand(s::MultiContinuousSpace{<:CuArray}) = rand(CUDA.CURAND.generator(), 
 Flux.testmode!(p::AbstractPolicy, mode = true) =
     @error "someone forgets to implement this method!!!"
 
-Base.show(io::IO, p::AbstractPolicy) = AbstractTrees.print_tree(io, StructTree(p),get(io, :max_depth, 15))
+Base.show(io::IO, p::AbstractPolicy) = AbstractTrees.print_tree(io, StructTree(p),get(io, :max_depth, 10))
 
 Base.summary(io::IO, t::T) where T<:AbstractPolicy = print(io, T.name)
 

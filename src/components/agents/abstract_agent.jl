@@ -76,4 +76,4 @@ Testing(s::T) where {T<:AbstractStage} = Testing{T}()
 
 Base.summary(io::IO, agent::T) where {T<:AbstractAgent} = print(io, T.name)
 
-Base.show(io::IO, agent::AbstractAgent) = AbstractTrees.print_tree(io, StructTree(agent),get(io, :max_depth, 15))
+Base.show(io::IO, agent::AbstractAgent) = AbstractTrees.print_tree(io, StructTree(agent),get(io, :max_depth, 10))
