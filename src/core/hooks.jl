@@ -61,6 +61,12 @@ struct EmptyHook <: AbstractHook end
 const EMPTY_HOOK = EmptyHook()
 
 #####
+# display
+#####
+
+Base.display(::AbstractStage, agent, env, args...; kwargs...) = display(env)
+
+#####
 # StepsPerEpisode
 #####
 
