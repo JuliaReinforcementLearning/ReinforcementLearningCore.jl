@@ -25,6 +25,7 @@ StatsBase = "2913bbd2-ae8a-5f71-8c99-4fb6c76f3a91"
 Zygote = "e88e6eb3-aa80-5325-afca-941959d7151f"
 
 [compat]
+AbstractTrees = "0.3"
 BSON = "0.2"
 Distributions = "0.22, 0.23"
 FillArrays = "0.8"
