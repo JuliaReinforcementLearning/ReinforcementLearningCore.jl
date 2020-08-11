@@ -1,6 +1,6 @@
 @testset "traces" begin
-    @testset "Trace" begin
-        t = Trace(;state=Vector{Int}(), reward=Vector{Bool}())
+    @testset "Trajectory" begin
+        t = Trajectory(;state=Vector{Int}(), reward=Vector{Bool}())
         @test (:state, :reward) == keys(t)
         @test haskey(t, :state)
         @test haskey(t, :reward)
@@ -16,8 +16,8 @@
         @test t[:reward] == Bool[]
     end
 
-    @testset "SharedTrace" begin
-        t = SharedTrace(Int[], :state)
+    @testset "SharedTrajectory" begin
+        t = SharedTrajectory(Int[], :state)
         @test (:state, :next_state, :full_state) == keys(t)
         @test haskey(t, :state)
         @test haskey(t, :next_state)
@@ -35,9 +35,9 @@
         @test t[:full_state] == Int[]
     end
 
-    @testset "EpisodicTrace" begin
-        t = EpisodicTrace(
-            Trace(;state=Vector{Int}(), reward=Vector{Bool}()),
+    @testset "EpisodicTrajectory" begin
+        t = EpisodicTrajectory(
+            Trajectory(;state=Vector{Int}(), reward=Vector{Bool}()),
             :reward
             )
 
@@ -61,8 +61,8 @@
         @test t[:reward] == Bool[]
     end
 
-    @testset "CombinedTrace" begin
-        t = CircularCompactPSALRTSALTrace(;capacity=3, legal_actions_mask_size=(2,))
+    @testset "CombinedTrajectory" begin
+        t = CircularCompactPSALRTSALTrajectory(;capacity=3, legal_actions_mask_size=(2,))
         push!(t; state=1, action=1, legal_actions_mask=[false, false])
         push!(t;reward=0.f0, terminal=false, priority=100, state=2, action=2, legal_actions_mask=[false, true])
 
