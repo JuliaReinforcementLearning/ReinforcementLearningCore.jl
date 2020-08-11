@@ -44,3 +44,5 @@ function Base.empty!(t::AbstractTrajectory)
         empty!(t[s])
     end
 end
+
+@deprecate get_trace(t::AbstractTrajectory, s::Symbol) t[s]
