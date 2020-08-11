@@ -35,6 +35,8 @@ const DUMMY_TRAJECTORY = Trajectory()
 Base.push!(t::Trajectory, kv::Pair{Symbol}) = push!(t[first(kv)], last(kv))
 Base.pop!(t::Trajectory, s::Symbol) = pop!(t[s])
 
+isfull(t::Trajectory) = all(isfull, t.traces)
+
 #####
 # SharedTrajectory
 #####
@@ -80,6 +82,8 @@ function Base.pop!(t::SharedTrajectory)
     s = first(keys(t))
     (;s => pop!(t.x))
 end
+
+isfull(t::SharedTrajectory) = isfull(t.x)
 
 #####
 # EpisodicTrajectory
@@ -145,6 +149,8 @@ function Base.empty!(t::CombinedTrajectory)
     empty!(t.t1)
     empty!(t.t2)
 end
+
+isfull(t::CombinedTrajectory) = isfull(t.t1) && isfull(t.t2)
 
 #####
 # CircularCompactSATrajectory 
