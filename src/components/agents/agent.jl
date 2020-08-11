@@ -91,7 +91,7 @@ function (agent::Agent)(::Training{PreEpisodeStage}, env)
     if nframes(agent.trajectory[:full_state]) > 0
         pop!(agent.trajectory, :full_state)
     end
-    if nframes(agent.trajectory[:full_action])
+    if nframes(agent.trajectory[:full_action]) > 0
         pop!(agent.trajectory, :full_action)
     end
     if ActionStyle(env) === FULL_ACTION_SET && nframes(agent.trajectory[:full_legal_actions_mask])

@@ -1,3 +1,14 @@
+export Trajectory,
+    SharedTrajectory,
+    EpisodicTrajectory,
+    CombinedTrajectory,
+    CircularCompactSATrajectory,
+    CircularCompactSALTrajectory,
+    CircularCompactSARTSATrajectory,
+    CircularCompactPSARTSATrajectory,
+    CircularCompactSALRTSALTrajectory,
+    CircularCompactPSALRTSALTrajectory
+
 using MacroTools:@forward
 
 #####
