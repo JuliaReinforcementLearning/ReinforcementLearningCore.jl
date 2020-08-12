@@ -45,4 +45,13 @@ function Base.empty!(t::AbstractTrajectory)
     end
 end
 
+#####
+# patch code
+#####
+
+# avoid showing the inner structure
+function AbstractTrees.children(t::StructTree{<:AbstractTrajectory})
+    Tuple(k => StructTree(t.x[k]) for k in keys(t.x))
+end
+
 @deprecate get_trace(t::AbstractTrajectory, s::Symbol) t[s]

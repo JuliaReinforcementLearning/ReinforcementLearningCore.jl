@@ -27,8 +27,8 @@ end
 
 Trajectory(;kwargs...) = Trajectory(kwargs.data)
 
-const DummyTrajectory = Trajectory{NamedTuple{(),Tuple{}}}
 const DUMMY_TRAJECTORY = Trajectory()
+const DummyTrajectory = typeof(DUMMY_TRAJECTORY)
 
 @forward Trajectory.traces Base.keys, Base.haskey, Base.getindex
 
@@ -47,7 +47,7 @@ struct SharedTrajectoryMeta
 end
 
 """
-    SharedTrajectory(trace;[trace_name=start_shift:end_shift]...)
+    SharedTrajectory(trace_container, meta::NamedTuple{([trace_name::Symbol],...), Tuple{[SharedTrajectoryMeta]...}})
 
 Create multiple traces sharing the same underlying container.
 """
@@ -56,6 +56,15 @@ struct SharedTrajectory{X,M} <: AbstractTrajectory
     meta::M
 end
 
+"""
+    SharedTrajectory(trace_container, s::Symbol)
+
+Automatically create the following three traces:
+
+- `s`, share the data in `trace_container` in the range of `1:end-1`
+- `s` with a prefix of `next_`, share the data in `trace_container` in the range of `2:end`
+- `s` with a prefix of `full_`, a view of `trace_container`
+"""
 function SharedTrajectory(x, s::Symbol)
     SharedTrajectory(
         x,
@@ -90,6 +99,8 @@ isfull(t::SharedTrajectory) = isfull(t.x)
 #####
 
 """
+    EpisodicTrajectory(traces::T, flag_trace=:terminal)
+
 Assuming that the `flag_trace` is in `traces` and it's an `AbstractVector{Bool}`, 
 meaning whether an environment reaches terminal or not. The last element in
 `flag_trace` will be used to determine whether the whole trace is full or not.
@@ -111,6 +122,9 @@ end
 # CombinedTrajectory
 #####
 
+"""
+    CombinedTrajectory(t1::AbstractTrajectory, t2::AbstractTrajectory)
+"""
 struct CombinedTrajectory{T1, T2} <: AbstractTrajectory
     t1::T1
     t2::T2
