@@ -79,59 +79,54 @@ function run(
 )
     @assert length(agents) == get_num_players(env)
 
+    hooks = Dict(get_role(agent) => hook for (agent, hook) in zip(agents, hooks))
+    agents = Dict(get_role(agent) => agent for agent in agents)
     reset!(env)
-    valid_action = rand(get_actions(env))  # init with a dummy value
+    
+    agent = agents[get_current_player(env)]
+    hook = hooks[get_current_player(env)]
 
-    # async here?
-    for (agent, hook) in zip(agents, hooks)
-        agent(PRE_EPISODE_STAGE, SubjectiveEnv(env, get_role(agent)))
-        hook(PRE_EPISODE_STAGE, agent, env)
-        action = agent(PRE_ACT_STAGE, SubjectiveEnv(env, get_role(agent)))
-        hook(PRE_ACT_STAGE, agent, env, action)
-        # for Sequential environments, only one action is valid
-        if get_current_player(env) == get_role(agent)
-            valid_action = action
-        end
+    for (A,H) in zip(values(agents), values(hooks))
+        A(PRE_EPISODE_STAGE, env)
+        H(PRE_EPISODE_STAGE, A, env)
     end
+
+    action = agent(PRE_ACT_STAGE, env)
+    hook(PRE_ACT_STAGE, agent, env, action)
 
     while true
-        env(valid_action)
-
-        for (agent, hook) in zip(agents, hooks)
-            agent(POST_ACT_STAGE, SubjectiveEnv(env, get_role(agent)))
-            hook(POST_ACT_STAGE, agent, env)
-        end
+        env(action)
+        agent(POST_ACT_STAGE, env)
+        hook(POST_ACT_STAGE, agent, env)
 
         if get_terminal(env)
-            for (agent, hook) in zip(agents, hooks)
-                agent(POST_EPISODE_STAGE, SubjectiveEnv(env, get_role(agent)))
-                hook(POST_EPISODE_STAGE, agent, env)
+            for (A,H) in zip(values(agents), values(hooks))
+                A(POST_EPISODE_STAGE, env)
+                H(POST_EPISODE_STAGE, A, env)
             end
 
-            stop_condition(agents, env) && break
+            stop_condition(agent, env) && break
+
             reset!(env)
-            # async here?
-            for (agent, hook) in zip(agents, hooks)
-                agent(PRE_EPISODE_STAGE, SubjectiveEnv(env, get_role(agent)))
-                hook(PRE_EPISODE_STAGE, agent, env)
-                action = agent(PRE_ACT_STAGE, SubjectiveEnv(env, get_role(agent)))
-                hook(PRE_ACT_STAGE, agent, env, action)
-                # for Sequential environments, only one action is valid
-                if get_current_player(env) == get_role(agent)
-                    valid_action = action
-                end
+
+            for (A,H) in zip(values(agents), values(hooks))
+                A(PRE_EPISODE_STAGE, env)
+                H(PRE_EPISODE_STAGE, A, env)
             end
+
+            agent = agents[get_current_player(env)]
+            hook = hooks[get_current_player(env)]
+            action = agent(PRE_ACT_STAGE, env)
+            hook(PRE_ACT_STAGE, agent, env, action)
         else
-            stop_condition(agents, env) && break
-            for (agent, hook) in zip(agents, hooks)
-                action = agent(PRE_ACT_STAGE, SubjectiveEnv(env, get_role(agent)))
-                hook(PRE_ACT_STAGE, agent, env, action)
-                # for Sequential environments, only one action is valid
-                if get_current_player(env) == get_role(agent)
-                    valid_action = action
-                end
-            end
+            stop_condition(agent, env) && break
+
+            agent = agents[get_current_player(env)]
+            hook = hooks[get_current_player(env)]
+            action = agent(PRE_ACT_STAGE, env)
+            hook(PRE_ACT_STAGE, agent, env, action)
         end
     end
+
     hooks
 end
