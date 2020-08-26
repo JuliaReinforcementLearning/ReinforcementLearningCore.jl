@@ -129,12 +129,22 @@ Base.@kwdef mutable struct TotalRewardPerEpisode <: AbstractHook
     reward::Float64 = 0.0
 end
 
-function (hook::TotalRewardPerEpisode)(::PostActStage, agent, env)
+(hook::TotalRewardPerEpisode)(s::PostActStage, agent, env) = hook(s, agent, env, NumAgentStyle(env))
+
+function (hook::TotalRewardPerEpisode)(::PostActStage, agent, env, ::SingleAgent)
     hook.reward += get_reward(env)
 end
 
-function (hook::TotalRewardPerEpisode)(::PostActStage, agent, env::RewardOverriddenEnv)
+function (hook::TotalRewardPerEpisode)(::PostActStage, agent, env::RewardOverriddenEnv, ::SingleAgent)
     hook.reward += get_reward(env.env)
+end
+
+function (hook::TotalRewardPerEpisode)(::PostActStage, agent, env, ::MultiAgent)
+    hook.reward += get_reward(env, get_role(agent))
+end
+
+function (hook::TotalRewardPerEpisode)(::PostActStage, agent, env::RewardOverriddenEnv, ::MultiAgent)
+    hook.reward += get_reward(env.env, get_role(agent))
 end
 
 function (hook::TotalRewardPerEpisode)(
