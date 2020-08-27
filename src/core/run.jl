@@ -1,3 +1,5 @@
+export expected_policy_values
+
 import Base: run
 
 run(agent, env::AbstractEnv, args...) =
@@ -86,9 +88,9 @@ function run(
     agent = agents[get_current_player(env)]
     hook = hooks[get_current_player(env)]
 
-    for (A,H) in zip(values(agents), values(hooks))
-        A(PRE_EPISODE_STAGE, env)
-        H(PRE_EPISODE_STAGE, A, env)
+    for p in get_players(env)
+        agents[p](PRE_EPISODE_STAGE, env)
+        hooks[p](PRE_EPISODE_STAGE, agents[p], env)
     end
 
     action = agent(PRE_ACT_STAGE, env)
@@ -100,18 +102,18 @@ function run(
         hook(POST_ACT_STAGE, agent, env)
 
         if get_terminal(env)
-            for (A,H) in zip(values(agents), values(hooks))
-                A(POST_EPISODE_STAGE, env)
-                H(POST_EPISODE_STAGE, A, env)
+            for p in get_players(env)
+                agents[p](POST_EPISODE_STAGE, env)
+                hooks[p](POST_EPISODE_STAGE, agents[p], env)
             end
 
             stop_condition(agent, env) && break
 
             reset!(env)
 
-            for (A,H) in zip(values(agents), values(hooks))
-                A(PRE_EPISODE_STAGE, env)
-                H(PRE_EPISODE_STAGE, A, env)
+            for p in get_players(env)
+                agents[p](PRE_EPISODE_STAGE, env)
+                hooks[p](PRE_EPISODE_STAGE, agents[p], env)
             end
 
             agent = agents[get_current_player(env)]
@@ -129,4 +131,43 @@ function run(
     end
 
     hooks
+end
+
+"""
+    expected_policy_values(agents, env)
+
+Calculate the expected return of each agent.
+"""
+expected_policy_values(agents::Tuple{Vararg{<:AbstractAgent}}, env::AbstractEnv) = expected_policy_values(Dict(get_role(agent) => agent for agent in agents), env)
+
+expected_policy_values(agents::Dict, env::AbstractEnv) = expected_policy_values(agents, env, RewardStyle(env), ChanceStyle(env), DynamicStyle(env))
+
+function expected_policy_values(agents::Dict, env::AbstractEnv, ::TerminalReward, ::Union{ExplicitStochastic,Deterministic}, ::Sequential)
+    if get_terminal(env)
+        [get_reward(env, get_role(agent)) for agent in values(agents)]
+    elseif get_current_player(env) == get_chance_player(env)
+        vals = zeros(length(agents))
+        for a::ActionProbPair in get_legal_actions(env)
+            vals .+= a.prob .* expected_policy_values(agents, child(env, a))
+        end
+        vals
+    else
+        vals = zeros(length(agents))
+        probs = get_prob(agents[get_current_player(env)].policy, env)
+        actions = get_actions(env)
+        for (a, p) in zip(actions, probs)
+            if p > 0 #= ignore illegal action =#
+                vals .+= p .* expected_policy_values(agents, child(env, a))
+            end
+        end
+        vals
+    end
+end
+
+function test_f(ps, env)
+    reset!(env)
+    while !get_terminal(env)
+        env |> ps[get_current_player(env)] |> env
+    end
+    [get_reward(env, p) for p in get_players(env) if p != get_chance_player(env)]
 end
