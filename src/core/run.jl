@@ -163,11 +163,3 @@ function expected_policy_values(agents::Dict, env::AbstractEnv, ::TerminalReward
         vals
     end
 end
-
-function test_f(ps, env)
-    reset!(env)
-    while !get_terminal(env)
-        env |> ps[get_current_player(env)] |> env
-    end
-    [get_reward(env, p) for p in get_players(env) if p != get_chance_player(env)]
-end
