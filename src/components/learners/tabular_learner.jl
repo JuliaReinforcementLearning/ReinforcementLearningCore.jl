@@ -30,5 +30,5 @@ function (p::TabularLearner)(env::AbstractEnv)
     end
 end
 
-update!(p::TabularLearner, experience::Pair) = p.table[first(experience)] = last(experience)
+RLBase.update!(p::TabularLearner, experience::Pair) = p.table[first(experience)] = last(experience)
 
