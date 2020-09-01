@@ -1,4 +1,4 @@
-export AbstractLearner, extract_experience
+export AbstractLearner
 
 using Flux
 
