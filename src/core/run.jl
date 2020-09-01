@@ -84,7 +84,7 @@ function run(
     hooks = Dict(get_role(agent) => hook for (agent, hook) in zip(agents, hooks))
     agents = Dict(get_role(agent) => agent for agent in agents)
     reset!(env)
-    
+
     agent = agents[get_current_player(env)]
     hook = hooks[get_current_player(env)]
 
