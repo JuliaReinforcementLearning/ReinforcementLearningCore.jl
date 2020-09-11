@@ -1,7 +1,7 @@
 using ElasticArrays
 
 Base.push!(a::ElasticArray, x) = append!(a, x)
-Base.empty!(a::ElasticArray) = ElasticArrays.resize_lastdim!(A, 0)
+Base.empty!(a::ElasticArray) = ElasticArrays.resize_lastdim!(a, 0)
 
 function Base.pop!(a::ElasticArray)
     # ??? Is it safe to do so?
