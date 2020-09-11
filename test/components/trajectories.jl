@@ -194,7 +194,7 @@
         @test t[:next_state] == Float32[2 3; 2 3]
         @test t[:next_action] == [2, 3]
 
-        @test pop!(t) == (reward = fill(2.0f0), terminal = fill(false), state = Float32[3.0, 3.0], action = fill(3))
+        @test pop!(t) == (reward = 2.0f0, terminal = true, state = Float32[3.0, 3.0], action = 3)
         push!(t; reward = 1f0, terminal = false, state = Float32[2, 2], action = 2)
         @test t[:state] == Float32[1 2; 1 2]
         @test t[:action] == [1, 2]
