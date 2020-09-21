@@ -40,6 +40,7 @@ device(::CuArray) = Val(:gpu)
 device(::Array) = Val(:cpu)
 device(x::Tuple{}) = nothing
 device(x::NamedTuple{(),Tuple{}}) = nothing
+device(x::ElasticArray) = device(x.data)
 
 function device(x::Random.AbstractRNG)
     if x isa CUDA.CURAND.RNG
