@@ -1,0 +1,27 @@
+export ReservoirArrayBuffer
+
+using Random
+using ElasticArrays
+using MacroTools:@forward
+
+mutable struct ReservoirArrayBuffer{T, N, B<:ElasticArray{T, N}, R<:AbstractRNG} <: AbstractArray{T, N}
+    buffer::B
+    capacity::Int
+    rng::R
+end
+
+ReservoirArrayBuffer{T}(dims::Int...;rng=Random.GLOBAL_RNG) where {T} = ReservoirArrayBuffer(ElasticArray{T}(undef, dims[1:end-1]..., 0), dims[end], rng)
+
+@forward ReservoirArrayBuffer.buffer Base.size, Base.getindex, Base.length, Base.sizeof, Base.IndexStyle
+
+# TODO: rename all push! to append!
+
+function Base.push!(b::ReservoirArrayBuffer{T, N}, x) where {T, N}
+    if size(b, N) < b.capacity
+        append!(b.buffer, x)
+    else
+        i = rand(b.rng, 1:size(b, N))
+        stride = b.buffer.kernel_length.divisor
+        b.buffer[(stride*(i-1)+1): stride*i] .= x
+    end
+end
