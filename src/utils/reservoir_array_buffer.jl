@@ -19,7 +19,7 @@ ReservoirArrayBuffer{T}(dims::Int...;rng=Random.GLOBAL_RNG) where {T} = Reservoi
 
 function Base.push!(b::ReservoirArrayBuffer{T, N}, x) where {T, N}
     b.n += 1
-    if size(b, N) < b.capacity
+    if b.n <= b.capacity
         append!(b.buffer, x)
     else
         i = rand(b.rng, 1:b.n)
