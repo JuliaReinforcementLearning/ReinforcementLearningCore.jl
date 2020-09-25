@@ -25,7 +25,7 @@ function Base.push!(b::ReservoirArrayBuffer{T, N}, x) where {T, N}
         i = rand(b.rng, 1:b.n)
         if i <= b.capacity
             stride = b.buffer.kernel_length.divisor
-            b.buffer[(stride*(i-1)+1): stride*i] .= x
+            @inbounds b.buffer.data[(stride*(i-1)+1): stride*i] .= x
         end
     end
 end
