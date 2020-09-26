@@ -1,3 +1,7 @@
+export normlogpdf
+
+# watch https://github.com/JuliaStats/Distributions.jl/issues/1183
+
 """
 GPU automatic differentiable version for the logpdf function of normal distributions.
 Adding an epsilon value to guarantee numeric stability if sigma is exactly zero
