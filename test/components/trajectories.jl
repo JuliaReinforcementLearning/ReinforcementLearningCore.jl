@@ -226,6 +226,7 @@
 
         # test distribution
 
+        Random.seed!(110)
         k, n, N = 3, 10, 10000
         stats = Dict(i => 0 for i in 1:n)
         for _ in 1:N
@@ -240,7 +241,7 @@
         end
 
         for v in values(stats)
-            @test isapprox(v/N, k/n;atol=0.01)
+            @test isapprox(v/N, k/n;atol=0.03)
         end
     end
 end
