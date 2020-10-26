@@ -5,8 +5,8 @@ using ReinforcementLearningBase
 """
     CircularArrayBuffer{T}(d::Integer...) -> CircularArrayBuffer{T, N}
 
-`CircularArrayBuffer` uses a `N`-dimention `Array` of size `d` to serve as a buffer for
-`N-1`-dimention `Array`s with the same size.
+`CircularArrayBuffer` uses a `N`-dimension `Array` of size `d` to serve as a buffer for
+`N-1`-dimension `Array`s with the same size.
 
 # Examples
 
