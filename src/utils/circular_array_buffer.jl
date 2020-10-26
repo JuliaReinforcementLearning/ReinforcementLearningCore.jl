@@ -151,7 +151,6 @@ end
 _buffer_frame(cb::CircularArrayBuffer, I::Vector{Int}) = map(i -> _buffer_frame(cb, i), I)
 
 function Base.empty!(cb::CircularArrayBuffer)
-    cb.first = 1
     cb.nframes = 0
     cb
 end
