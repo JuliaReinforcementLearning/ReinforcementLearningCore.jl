@@ -137,11 +137,7 @@ end
 @inline function _buffer_frame(cb::CircularArrayBuffer, i::Int)
     n = capacity(cb)
     idx = cb.first + i - 1
-    if idx > n
-        idx - n
-    else
-        idx
-    end
+    mod1(idx, n)
 end
 
 _buffer_frame(cb::CircularArrayBuffer, I::Vector{Int}) = map(i -> _buffer_frame(cb, i), I)
