@@ -131,11 +131,7 @@ Base.isempty(cb::CircularArrayBuffer) = cb.nframes == 0
 
 @inline function _buffer_index(cb::CircularArrayBuffer, i::Int)
     ind = (cb.first - 1) * cb.step_size + i
-    if ind > length(cb.buffer)
-        ind - length(cb.buffer)
-    else
-        ind
-    end
+    mod1(ind, length(cb.buffer))
 end
 
 @inline function _buffer_frame(cb::CircularArrayBuffer, i::Int)
