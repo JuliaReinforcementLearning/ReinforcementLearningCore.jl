@@ -35,9 +35,6 @@ julia> b
 julia> length(b)
 4
 
-julia> nframes(cb::CircularArrayBuffer) = cb.length
-nframes (generic function with 1 method)
-
 julia> nframes(b)
 1
 
