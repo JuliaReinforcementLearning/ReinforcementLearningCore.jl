@@ -6,10 +6,12 @@ using MacroTools: @forward
 # Client part
 #####
 
-struct TrajectoryClient{T<:AbstractTrajectory, S} <: AbstractTrajectory
+mutable struct TrajectoryClient{T<:AbstractTrajectory,A,S} <: AbstractTrajectory
     trajectory::T
-    bulk_size::Int
+    adder::A
     mailbox::S
+    sync_freq::Int
+    n::Int
 end
 
 @forward TrajectoryClient.trajectory Base.keys,
@@ -21,35 +23,40 @@ isfull
 
 function Base.push!(t::TrajectoryClient, args...;kwargs...)
     push!(t.trajectory, args...;kwargs...)
-    _sync(t)
+    t.n += 1
+
+    if t.n % t.sync_freq == 0
+        put!(t.mailbox, deepcopy(t.trajectoryj))
+    end
 end
 
-# Given that CircularCompactSARTSATrajectory is the most common one
-# We'll focus on the implementations around it for now
 
-function _sync(t::TrajectoryClient{CircularCompactSARTSATrajectory})
-    if nframes(t.trajectory[:full_state]) >= t.bulk_size
-        # TODO: here we simply create an copy to avoid sharing the same data accross different tasks
-        # But for remote channels, this is redundant because it will always copy the data.
-        d = deepcopy(t.trajectory)
-        put!(t.mailbox, d)
-    end
+#####
+# TrajectorySampler
+#####
+
+abstract type AbstractAdder end
+
+Base.@kwdef struct NStepAdder <: AbstractAdder
+    n::Int = 1
 end
 
 #####
 # Server part
 #####
 
-function Base.push!(t::VectSARTSATrajectory, 𝕥::CircularCompactSARTSATrajectory)
-    for i in 1:length(𝕥[:terminal])
+function Base.push!(t::VectSARTSATrajectory, 𝕥::CircularCompactSARTSATrajectory, adder::NStepAdder)
+    N = length(𝕥[:terminal])
+    n = adder.n
+    for i in 1:(N-n+1)
         push!(
             t;
-            state=select_last_dim(𝕥[:state], i),
-            action=select_last_dim(𝕥[:action], i),
-            reward=select_last_dim(𝕥[:reward], i),
-            terminal=select_last_dim(𝕥[:terminal], i),
-            next_state=select_last_dim(𝕥[:next_state], i),
-            next_action=select_last_dim(𝕥[:next_action], i),
+            state=select_last_dim(𝕥[:state], i:i+n-1),
+            action=select_last_dim(𝕥[:action], i:i+n-1),
+            reward=select_last_dim(𝕥[:reward], i:i+n-1),
+            terminal=select_last_dim(𝕥[:terminal], i:i+n-1),
+            next_state=select_last_dim(𝕥[:next_state], i:i+n-1),
+            next_action=select_last_dim(𝕥[:next_action], i:i+n-1),
             )
     end
 end

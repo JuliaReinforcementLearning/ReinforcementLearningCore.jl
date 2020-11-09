@@ -15,7 +15,7 @@ end
 
 (π::StaticPolicy)(env) = π.p(env)
 
-@forward OffPolicy.p RLBase.get_priority, RLBase.get_prob
+@forward StaticPolicy.p RLBase.get_priority, RLBase.get_prob
 
 RLBase.update!(p::StaticPolicy, args...) = nothing
 
