@@ -1,4 +1,4 @@
-export StopAfterStep, StopAfterEpisode, StopWhenDone, ComposedStopCondition
+export StopAfterStep, StopAfterEpisode, StopWhenDone, ComposedStopCondition, StopSignal
 
 using ProgressMeter
 
@@ -114,3 +114,23 @@ Return `true` if the environment is terminated.
 struct StopWhenDone end
 
 (s::StopWhenDone)(agent, env) = get_terminal(env)
+
+#####
+# StopSignal
+#####
+
+"""
+    StopSignal()
+
+Create a stop signal initialized with a value of `false`.
+You can manually set it to `true` by `s[] = true` to stop
+the running loop at any time.
+"""
+Base.@kwdef struct StopSignal
+    is_stop::Ref{Bool} = Ref(false)
+end
+
+Base.getindex(s::StopSignal) = s.is_stop[]
+Base.setindex!(s::StopSignal, v::Bool) = s.is_stop[] = v
+
+(s::StopSignal)(args...) = s[]

@@ -327,6 +327,8 @@ function VectSARTSATrajectory(
         )
 end
 
+Base.length(t::VectSARTSATrajectory) = length(t[:state])
+
 #####
 # CircularCompactSARTSATrajectory
 #####
