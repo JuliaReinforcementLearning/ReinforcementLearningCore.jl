@@ -12,7 +12,7 @@ Base.@kwdef struct NStepInserter <: AbstractInserter
     n::Int = 1
 end
 
-function Base.push!(t::VectSARTSATrajectory, 𝕥::CircularCompactSARTSATrajectory, adder::NStepInserter)
+function Base.push!(t::CircularSARTSATrajectory, 𝕥::CircularCompactSARTSATrajectory, adder::NStepInserter)
     N = length(𝕥[:terminal])
     n = adder.n
     for i in 1:(N-n+1)
@@ -39,7 +39,7 @@ end
 
 StatsBase.sample(t::AbstractTrajectory, sampler::AbstractSampler) = sample(Random.GLOBAL_RNG, t, sampler)
 
-function StatsBase.sample(rng::AbstractRNG, t::VectSARTSATrajectory, sampler::UniformBatchSampler)
+function StatsBase.sample(rng::AbstractRNG, t::Union{VectSARTSATrajectory, CircularSARTSATrajectory}, sampler::UniformBatchSampler)
     inds = rand(rng, 1:length(t), sampler.batch_size)
     (
         state=Flux.batch(t[:state][inds]),

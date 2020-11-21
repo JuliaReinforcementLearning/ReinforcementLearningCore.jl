@@ -9,17 +9,17 @@ const update! = ReinforcementLearningBase.update!
 #####
 
 """
-    ComposedStopCondition(stop_conditions; reducer = any)
+    ComposedStopCondition(stop_conditions...; reducer = any)
 
 The result of `stop_conditions` is reduced by `reducer`.
 """
-struct ComposedStopCondition{T<:Function}
-    stop_conditions::Vector{Any}
+struct ComposedStopCondition{S,T}
+    stop_conditions::S
     reducer::T
+    function ComposedStopCondition(stop_conditions...; reducer = any)
+        new{typeof(stop_conditions), typeof(reducer)}(stop_conditions, reducer)
+    end
 end
-
-ComposedStopCondition(stop_conditions; reducer = any) =
-    ComposedStopCondition(stop_conditions, reducer)
 
 function (s::ComposedStopCondition)(args...)
     s.reducer(sc(args...) for sc in s.stop_conditions)
@@ -133,4 +133,4 @@ end
 Base.getindex(s::StopSignal) = s.is_stop[]
 Base.setindex!(s::StopSignal, v::Bool) = s.is_stop[] = v
 
-(s::StopSignal)(args...) = s[]
+(s::StopSignal)(agent, env) = s[]

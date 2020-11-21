@@ -12,7 +12,8 @@ export Trajectory,
     CircularCompactPSARTSATrajectory,
     CircularCompactSALRTSALTrajectory,
     CircularCompactPSALRTSALTrajectory,
-    VectSARTSATrajectory
+    VectSARTSATrajectory,
+    CircularSARTSATrajectory
 
 using MacroTools: @forward
 using ElasticArrays
@@ -328,6 +329,38 @@ function VectSARTSATrajectory(
 end
 
 Base.length(t::VectSARTSATrajectory) = length(t[:state])
+
+#####
+# CircularSARTSATrajectory
+#####
+
+const CircularSARTSATrajectory = Trajectory{
+    <:NamedTuple{
+        (:state, :action, :reward, :terminal, :next_state, :next_action),
+        <:Tuple{<:CircularArrayBuffer,<:CircularArrayBuffer,<:CircularArrayBuffer,<:CircularArrayBuffer,<:CircularArrayBuffer,<:CircularArrayBuffer}}}
+
+function CircularSARTSATrajectory(;
+    capacity,
+    state_type = Float32,
+    state_size = (),
+    action_type = Int,
+    action_size = (),
+    reward_type = Float32,
+    reward_size = (),
+    terminal_type = Bool,
+    terminal_size = (),
+)
+    Trajectory(
+        state = CircularArrayBuffer{state_type}(state_size..., capacity),
+        action = CircularArrayBuffer{action_type}(action_size..., capacity),
+        reward = CircularArrayBuffer{reward_type}(reward_size..., capacity),
+        terminal = CircularArrayBuffer{terminal_type}(terminal_size..., capacity),
+        next_state = CircularArrayBuffer{state_type}(state_size..., capacity),
+        next_action = CircularArrayBuffer{action_type}(action_size..., capacity),
+    )
+end
+
+Base.length(t::CircularSARTSATrajectory) = length(t[:state])
 
 #####
 # CircularCompactSARTSATrajectory

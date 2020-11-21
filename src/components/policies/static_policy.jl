@@ -20,3 +20,5 @@ end
 RLBase.update!(p::StaticPolicy, args...) = nothing
 
 RLBase.update!(p::StaticPolicy, ps::Params) = update!(p.p, ps)
+
+Flux.@functor StaticPolicy
