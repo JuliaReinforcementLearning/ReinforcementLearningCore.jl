@@ -44,6 +44,11 @@ Base.pop!(t::Trajectory, s::Symbol) = pop!(t[s])
 
 isfull(t::Trajectory) = all(isfull, t.traces)
 
+# !!! this is a strong assumption, always check it when implementing new Trajectories
+# !!! we use `nframes` instead of `length` to avoid some corner cases.
+# !!! For example, in `MultiThreadEnv`, the `length(t[:terminal])` is `n_ENV * n_transitions`
+Base.length(t::AbstractTrajectory) = nframes(t[:terminal])  
+
 #####
 # SharedTrajectory
 #####
@@ -328,8 +333,6 @@ function VectSARTSATrajectory(
         )
 end
 
-Base.length(t::VectSARTSATrajectory) = length(t[:state])
-
 #####
 # CircularSARTSATrajectory
 #####
@@ -359,8 +362,6 @@ function CircularSARTSATrajectory(;
         next_action = CircularArrayBuffer{action_type}(action_size..., capacity),
     )
 end
-
-Base.length(t::CircularSARTSATrajectory) = length(t[:state])
 
 #####
 # CircularCompactSARTSATrajectory

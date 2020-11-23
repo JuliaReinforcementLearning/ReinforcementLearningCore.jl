@@ -39,14 +39,22 @@ end
 
 StatsBase.sample(t::AbstractTrajectory, sampler::AbstractSampler) = sample(Random.GLOBAL_RNG, t, sampler)
 
-function StatsBase.sample(rng::AbstractRNG, t::Union{VectSARTSATrajectory, CircularSARTSATrajectory}, sampler::UniformBatchSampler)
+function StatsBase.sample(
+    rng::AbstractRNG,
+    t::VectSARTSATrajectory,
+    sampler::UniformBatchSampler,
+    trace_names=(:state, :action, :reward, :terminal, :next_state, :next_action)
+)
     inds = rand(rng, 1:length(t), sampler.batch_size)
-    (
-        state=Flux.batch(t[:state][inds]),
-        action=Flux.batch(t[:action][inds]),
-        reward=Flux.batch(t[:reward][inds]),
-        terminal=Flux.batch(t[:terminal][inds]),
-        next_state=Flux.batch(t[:next_state][inds]),
-        next_action=Flux.batch(t[:next_action][inds]),
-    )
+    NamedTuple{trace_names}(Flux.batch(view(t[x], inds)) for x in trace_names)
+end
+
+function StatsBase.sample(
+    rng::AbstractRNG,
+    t::Union{CircularCompactSARTSATrajectory, CircularSARTSATrajectory},
+    sampler::UniformBatchSampler,
+    trace_names=(:state, :action, :reward, :terminal, :next_state, :next_action)
+)
+    inds = rand(rng, 1:length(t), sampler.batch_size)
+    NamedTuple{trace_names}(convert(Array, consecutive_view(t[x], inds)) for x in trace_names)
 end
