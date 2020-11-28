@@ -44,21 +44,14 @@ end
 
 function (p::StackFrames{T,N})(state::AbstractArray) where {T,N}
     push!(p.buffer, state)
-    p.buffer
+    p
 end
 
-# !!! side effect?
-function Base.push!(
-    cb::CircularArrayBuffer{T,N},
-    stacked_data::CircularArrayBuffer{T,N},
-) where {T,N}
-    push!(cb, select_last_frame(stacked_data))
+function Base.push!(cb::CircularArrayBuffer, p::StackFrames)
+    push!(cb, select_last_frame(p.buffer))
 end
 
 function RLBase.reset!(p::StackFrames{T,N}) where {T,N}
-    empty!(p.buffer)
-    for _ in 1:CircularArrayBuffers.capacity(p.buffer)
-        push!(p.buffer, zeros(T, size(p.buffer)[1:N-1]))
-    end
+    fill!(p.buffer, zero(T))
     p
 end
