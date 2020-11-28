@@ -1,10 +1,10 @@
 export device, send_to_host, send_to_device
 
-using ElasticArrays
 using Flux
 using CUDA
 using Adapt
 using Random
+using ElasticArrays
 
 import CUDA: device
 
