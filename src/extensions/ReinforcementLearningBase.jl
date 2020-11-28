@@ -12,7 +12,7 @@ Random.rand(s::MultiContinuousSpace{<:CuArray}) = rand(CUDA.CURAND.generator(), 
 Base.show(io::IO, p::AbstractPolicy) =
     AbstractTrees.print_tree(io, StructTree(p), get(io, :max_depth, 10))
 
-AbstractTrees.children(t::StructTree{<:AbstractEnv}) = ()
+is_expand(::AbstractEnv) = false
 
 AbstractTrees.printnode(io::IO, t::StructTree{<:AbstractEnv}) = print(
     io,
