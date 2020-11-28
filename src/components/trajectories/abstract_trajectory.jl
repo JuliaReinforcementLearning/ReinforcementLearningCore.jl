@@ -1,57 +1,63 @@
-export AbstractTrajectory
+export AbstractTrajectory,
+    SART,
+    SARTSA
 
 """
     AbstractTrajectory
 
-A trace is used to record some useful information
+A trajectory is used to record some useful information
 during the interactions between agents and environments.
+It behaves similar to a `NamedTuple` except that we extend it
+with some optional methods.
 
 Required Methods:
 
-- `Base.haskey(t::AbstractTrajectory, s::Symbol)`
-- `Base.getindex(t::AbstractTrajectory, s::Symbol)`
-- `Base.keys(t::AbstractTrajectory)`
-- `Base.push!(t::AbstractTrajectory, kv::Pair{Symbol})`
-- `Base.pop!(t::AbstractTrajectory, s::Symbol)`
-- `Base.empty!(t::AbstractTrajectory)`
+- `Base.getindex`
+- `Base.keys`
 
 Optional Methods:
 
-- `isfull`
-
+- `Base.length`
+- `Base.isempty`
+- `Base.empty!`
+- `Base.haskey`
+- `Base.push!`
+- `Base.pop!`
 """
 abstract type AbstractTrajectory end
 
-function Base.push!(t::AbstractTrajectory; kwargs...)
-    for kv in kwargs
-        push!(t, kv)
-    end
-end
-
-"""
-    Base.pop!(t::AbstractTrajectory, s::Symbol...)
-
-`pop!` out one element of the traces specified in `s`
-"""
-function Base.pop!(t::AbstractTrajectory, s::Tuple{Vararg{Symbol}})
-    NamedTuple{s}(pop!(t, x) for x in s)
-end
-
-Base.pop!(t::AbstractTrajectory) = pop!(t, keys(t))
+Base.haskey(t::AbstractTrajectory, s::Symbol) = s in keys(t)
+Base.isempty(t::AbstractTrajectory) = all(k -> isempty(t[k]), keys(t))
 
 function Base.empty!(t::AbstractTrajectory)
-    for s in keys(t)
-        empty!(t[s])
+    for k in keys(t)
+        empty!(t[k])
+    end
+end
+
+function Base.push!(t::AbstractTrajectory;kwargs...)
+    for (k,v) in kwargs
+        push!(t[k], v)
+    end
+end
+
+function Base.pop!(t::AbstractTrajectory)
+    for k in keys(t)
+        pop!(t[k])
+    end
+end
+
+function Base.show(io::IO, t::AbstractTrajectory)
+    println(io, "Trajectory of $(length(keys(t))) traces:")
+    for k in keys(t)
+        show(io, k)
+        println(" $(summary(t[k]))")
     end
 end
 
 #####
-# patch code
+# Common Keys
 #####
 
-# avoid showing the inner structure
-function AbstractTrees.children(t::StructTree{<:AbstractTrajectory})
-    Tuple(k => StructTree(t.x[k]) for k in keys(t.x))
-end
-
-@deprecate get_trace(t::AbstractTrajectory, s::Symbol) t[s]
+const SART = (:state, :action, :reward, :terminal)
+const SARTSA = (:state, :action, :reward, :terminal, :next_state, :next_action)

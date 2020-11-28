@@ -1,6 +1,8 @@
 export StackFrames, ResizeImage
 
 using ImageTransformations: imresize!
+import CircularArrayBuffers
+using CircularArrayBuffers:CircularArrayBuffer
 
 """
     ResizeImage(img::Array{T, N})
@@ -34,7 +36,7 @@ StackFrames(d::Int...) = StackFrames(Float32, d...)
 
 function StackFrames(::Type{T}, d::Vararg{Int,N}) where {T,N}
     p = StackFrames(CircularArrayBuffer{T}(d...))
-    for _ in 1:capacity(p.buffer)
+    for _ in 1:CircularArrayBuffers.capacity(p.buffer)
         push!(p.buffer, zeros(T, size(p.buffer)[1:N-1]))
     end
     p
@@ -55,7 +57,7 @@ end
 
 function RLBase.reset!(p::StackFrames{T,N}) where {T,N}
     empty!(p.buffer)
-    for _ in 1:capacity(p.buffer)
+    for _ in 1:CircularArrayBuffers.capacity(p.buffer)
         push!(p.buffer, zeros(T, size(p.buffer)[1:N-1]))
     end
     p

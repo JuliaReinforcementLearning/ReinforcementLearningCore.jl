@@ -13,22 +13,18 @@ Base.@kwdef struct NStepInserter <: AbstractInserter
 end
 
 function Base.push!(
-    t::CircularSARTSATrajectory,
-    𝕥::CircularCompactSARTSATrajectory,
-    adder::NStepInserter,
+    t::CircularVectorSARTSATrajectory,
+    𝕥::CircularArraySARTTrajectory,
+    inserter::NStepInserter,
 )
-    N = length(𝕥[:terminal])
-    n = adder.n
+    N = length(𝕥)
+    n = inserter.n
     for i in 1:(N-n+1)
-        push!(
-            t;
-            state = select_last_dim(𝕥[:state], i),
-            action = select_last_dim(𝕥[:action], i),
-            reward = select_last_dim(𝕥[:reward], i),
-            terminal = select_last_dim(𝕥[:terminal], i),
-            next_state = select_last_dim(𝕥[:next_state], i + n - 1),
-            next_action = select_last_dim(𝕥[:next_action], i + n - 1),
-        )
+        for k in SART
+            push!(t[k], select_last_dim(𝕥[k], i))
+        end
+        push!(t[:next_state], select_last_dim(𝕥[:state], i+n))
+        push!(t[:next_action], select_last_dim(𝕥[:action], i+n))
     end
 end
 
@@ -42,25 +38,28 @@ struct UniformBatchSampler <: AbstractSampler
     batch_size::Int
 end
 
-StatsBase.sample(t::AbstractTrajectory, sampler::AbstractSampler) =
-    sample(Random.GLOBAL_RNG, t, sampler)
+"""
+    sample([rng=Random.GLOBAL_RNG], trajectory, sampler, [traces=keys(trajectory)])
 
-function StatsBase.sample(
-    rng::AbstractRNG,
-    t::VectSARTSATrajectory,
-    sampler::UniformBatchSampler,
-    trace_names=(:state, :action, :reward, :terminal, :next_state, :next_action)
-)
-    inds = rand(rng, 1:length(t), sampler.batch_size)
-    NamedTuple{trace_names}(Flux.batch(view(t[x], inds)) for x in trace_names)
+!!! note
+    Here we return a copy instead of a view:
+    1. Each sample is independent of the original `trajectory` so that `trajectory` can be updated async.
+    2. [Copy is not always so bad](https://docs.julialang.org/en/v1/manual/performance-tips/#Copying-data-is-not-always-bad).
+"""
+function StatsBase.sample(t::AbstractTrajectory, sampler::AbstractSampler, traces=keys(t))
+    sample(Random.GLOBAL_RNG, t, sampler, traces)
 end
 
-function StatsBase.sample(
-    rng::AbstractRNG,
-    t::Union{CircularCompactSARTSATrajectory, CircularSARTSATrajectory},
-    sampler::UniformBatchSampler,
-    trace_names=(:state, :action, :reward, :terminal, :next_state, :next_action)
-)
-    inds = rand(rng, 1:length(t), sampler.batch_size)
-    NamedTuple{trace_names}(convert(Array, consecutive_view(t[x], inds)) for x in trace_names)
+function StatsBase.sample(rng::AbstractRNG, t::CircularVectorSARTSATrajectory, s::UniformBatchSampler, traces)
+    inds = rand(rng, 1:length(t), s.batch_size)
+    map(traces) do x
+        Flux.batch(view(t[x], inds))
+    end
+end
+
+function StatsBase.sample(rng::AbstractRNG, t::CircularArraySARTTrajectory, s::UniformBatchSampler, traces)
+    inds = rand(rng, 1:length(t), s.batch_size)
+    map(traces) do x
+        convert(Array, consecutive_view(t[x], inds))
+    end
 end

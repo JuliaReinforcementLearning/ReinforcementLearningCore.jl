@@ -9,7 +9,7 @@ _run(agent, env, args...) = _run(DynamicStyle(env), NumAgentStyle(env), agent, e
 function _run(
     ::Sequential,
     ::SingleAgent,
-    agent::AbstractAgent,
+    agent::Agent,
     env::AbstractEnv,
     stop_condition,
     hook::AbstractHook = EmptyHook(),
@@ -49,7 +49,7 @@ end
 function _run(
     ::Sequential,
     ::SingleAgent,
-    agent::AbstractAgent,
+    agent::Agent,
     env::MultiThreadEnv,
     stop_condition,
     hook::AbstractHook = EmptyHook(),
@@ -75,7 +75,7 @@ end
 function _run(
     ::Sequential,
     ::MultiAgent,
-    agents::Tuple{Vararg{<:AbstractAgent}},
+    agents::Tuple{Vararg{<:Agent}},
     env::AbstractEnv,
     stop_condition,
     hooks = [EmptyHook() for _ in agents],
