@@ -3,6 +3,7 @@ export StackFrames, ResizeImage
 using ImageTransformations: imresize!
 import CircularArrayBuffers
 using CircularArrayBuffers:CircularArrayBuffer
+using MacroTools:@forward
 
 """
     ResizeImage(img::Array{T, N})
@@ -26,11 +27,15 @@ end
 """
     StackFrames(::Type{T}=Float32, d::Int...)
 
-Use a pre-initialized [`CircularArrayBuffer`](@ref) to store the latest several states specified by `d`. Before processing any observation, the buffer is filled with `zero{T}`.
+Use a pre-initialized [`CircularArrayBuffer`](@ref) to store the latest several states specified by `d`. Before processing any observation, the buffer is filled with `zero{T}
+by default.
 """
-struct StackFrames{T,N}
+struct StackFrames{T,N} <: AbstractArray{T,N}
     buffer::CircularArrayBuffer{T,N}
 end
+
+@forward StackFrames.buffer Base.size, Base.getindex
+Base.IndexStyle(x::StackFrames) = IndexStyle(x.buffer)
 
 StackFrames(d::Int...) = StackFrames(Float32, d...)
 
