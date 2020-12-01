@@ -22,7 +22,10 @@ frame_type(::Array{T,N}) where {T,N} = Array{T,N - 1}
 frame_type(::Vector{T}) where {T} = T
 
 select_last_dim(xs::AbstractArray{T,N}, inds) where {T,N} =
-    @views xs[ntuple(_ -> (:), N - 1)..., inds]
+    xs[ntuple(_ -> (:), N - 1)..., inds]
+
+# useful for function piping
+select_last_dim(inds) = x -> select_last_dim(x, inds)
 
 select_last_frame(xs::AbstractArray{T,N}) where {T,N} = select_last_dim(xs, size(xs, N))
 
