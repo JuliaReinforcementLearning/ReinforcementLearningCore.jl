@@ -1,5 +1,5 @@
 export Agent,
-    role
+    get_role
 
 import Functors:functor
 using Setfield: @set
@@ -16,20 +16,20 @@ update the trajectory and policy appropriately in different stages and modes.
 - `trajectory`::[`AbstractTrajectory`](@ref): used to store transitions between an agent and an environment
 - `role=RLBase.DEFAULT_PLAYER`: used to distinguish different agents
 """
-Base.@kwdef struct Agent{P<:AbstractPolicy,T<:AbstractTrajectory,R,M} <: AbstractPolicy
+Base.@kwdef mutable struct Agent{P<:AbstractPolicy,T<:AbstractTrajectory,R} <: AbstractPolicy
     policy::P
     trajectory::T = DUMMY_TRAJECTORY
     role::R = RLBase.DEFAULT_PLAYER
-    mode::M = TRAIN_MODE
+    mode::Union{TrainMode,EvalMode,TestMode} = TRAIN_MODE
 end
 
 functor(x::Agent) = (policy = x.policy,), y -> @set x.policy = y.policy
 
-role(agent::Agent) = agent.role
+get_role(agent::Agent) = agent.role
 mode(agent::Agent) = agent.mode
+set_mode!(agent::Agent, mode::AbstractMode) = agent.mode = mode
+
 (agent::Agent)(env) = agent.policy(env)
-
-
 (agent::Agent)(stage::AbstractStage, env::AbstractEnv) = agent(env, stage, mode(agent))
 
 function (agent::Agent)(env::AbstractEnv, stage::AbstractStage, mode::AbstractMode)
