@@ -63,3 +63,5 @@ end
 const SART = (:state, :action, :reward, :terminal)
 const SARTS = (:state, :action, :reward, :terminal, :next_state)
 const SARTSA = (:state, :action, :reward, :terminal, :next_state, :next_action)
+const SLARTSL = (:state, :legal_actions_mask, :action, :reward, :terminal, :next_state, :next_legal_actions_mask)
+const SLARTSLA = (:state, :legal_actions_mask, :action, :reward, :terminal, :next_state, :next_legal_actions_mask, :next_action)

@@ -1,4 +1,4 @@
-export NStepInserter, UniformBatchSampler
+export NStepInserter, BatchSampler, NStepBatchSampler
 
 using Random
 
@@ -34,12 +34,6 @@ end
 
 abstract type AbstractSampler{traces} end
 
-struct UniformBatchSampler{traces} <: AbstractSampler{traces}
-    batch_size::Int
-end
-
-UniformBatchSampler(batch_size::Int) = UniformBatchSampler{SARTSA}(batch_size)
-
 """
     sample([rng=Random.GLOBAL_RNG], trajectory, sampler, [traces=Val(keys(trajectory))])
 
@@ -52,15 +46,79 @@ function StatsBase.sample(t::AbstractTrajectory, sampler::AbstractSampler)
     sample(Random.GLOBAL_RNG, t, sampler)
 end
 
-function StatsBase.sample(rng::AbstractRNG, t::CircularVectorSARTSATrajectory, s::UniformBatchSampler{SARTSA})
-    inds = rand(rng, 1:length(t), s.batch_size)
-    NamedTuple{SARTSA}(Flux.batch(view(t[x], inds)) for x in SARTSA)
+#####
+## BatchSampler
+#####
+
+struct BatchSampler{traces} <: AbstractSampler{traces}
+    batch_size::Int
 end
 
-function StatsBase.sample(rng::AbstractRNG, t::CircularArraySARTTrajectory, s::UniformBatchSampler{SARTS})
+BatchSampler(batch_size::Int) = BatchSampler{SARTSA}(batch_size)
+
+function StatsBase.sample(rng::AbstractRNG, t::AbstractTrajectory, s::BatchSampler)
     inds = rand(rng, 1:length(t), s.batch_size)
+    sample(inds, t, s)
+end
+
+function StatsBase.sample(inds::Vector{Int}, t::CircularVectorSARTSATrajectory, s::BatchSampler{traces}) where traces
+    NamedTuple{SARTSA}(Flux.batch(view(t[x], inds)) for x in traces)
+end
+
+function StatsBase.sample(inds::Vector{Int}, t::CircularArraySARTTrajectory, s::BatchSampler{SARTS})
     NamedTuple{SARTS}((
         (convert(Array, consecutive_view(t[x], inds)) for x in SART)...,
         convert(Array,consecutive_view(t[:state], inds.+1))
     ))
+end
+
+#####
+## NStepBatchSampler
+#####
+
+Base.@kwdef struct NStepBatchSampler{traces} <: AbstractSampler{traces}
+    γ::Float32
+    n::Int = 1
+    batch_size::Int = 32
+    stack_size::Union{Nothing,Int} = nothing
+end
+
+function StatsBase.sample(rng::AbstractRNG, t::AbstractTrajectory, s::NStepBatchSampler)
+    inds = rand(rng, 1:(length(t)-s.n+1), s.batch_size)
+    sample(inds, t, s)
+end
+
+function StatsBase.sample(inds::Vector{Int}, traj::CircularArraySARTTrajectory, s::NStepBatchSampler{traces}) where traces
+    γ, n, bz, sz = s.γ, s.n, s.batch_size, s.stack_size
+    next_inds = inds .+ n
+
+    s = convert(Array, consecutive_view(traj[:state], inds;n_stack = sz))
+    a = convert(Array, consecutive_view(traj[:action], inds))
+    s′ = convert(Array, consecutive_view(traj[:state], next_inds;n_stack = sz))
+
+    consecutive_rewards = consecutive_view(traj[:reward], inds; n_horizon = n)
+    consecutive_terminals = consecutive_view(traj[:terminal], inds; n_horizon = n)
+    r, t = zeros(Float32, bz), fill(false, bz)
+
+    # make sure that we only consider experiences in current episode
+    for i in 1:bz
+        m = findfirst(view(consecutive_terminals, :, i))
+        if isnothing(m)
+            t[i] = false
+            r[i] = discount_rewards_reduced(view(consecutive_rewards, :, i), γ)
+        else
+            t[i] = true
+            r[i] = discount_rewards_reduced(view(consecutive_rewards, 1:m, i), γ)
+        end
+    end
+
+    if traces == SARTS
+        NamedTuple{SARTS}((s, a, r, t, s′))
+    elseif traces == SLARTSL
+        l = convert(Array, consecutive_view(traj[:legal_actions_mask], inds))
+        l′ = convert(Array, consecutive_view(traj[:next_legal_actions_mask], next_inds))
+        NamedTuple{SLARTSL}((s, l, a, r, t, s′, l′))
+    else
+        @error "unsupported traces $traces"
+    end
 end
