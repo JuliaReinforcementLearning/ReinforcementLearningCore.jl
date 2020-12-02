@@ -1,4 +1,5 @@
 export Trajectory,
+    PrioritizedTrajectory,
     DUMMY_TRAJECTORY,
     DummyTrajectory,
     CircularArrayTrajectory,
@@ -6,6 +7,7 @@ export Trajectory,
     CircularArraySARTTrajectory,
     CircularVectorSARTTrajectory,
     CircularVectorSARTSATrajectory,
+    CircularArrayPSARTTrajectory,
     VectorTrajectory
 
 using MacroTools: @forward
@@ -113,6 +115,30 @@ function VectorTrajectory(;kwargs...)
         Vector{x}()
     end)
 end
+
+#####
+
+Base.@kwdef struct PrioritizedTrajectory{P,T} <: AbstractTrajectory
+    priority::P
+    traj::T
+end
+
+Base.keys(t::PrioritizedTrajectory) = (:priority, keys(t.traj)...)
+
+Base.length(t::PrioritizedTrajectory) = length(t.priority)
+
+Base.getindex(t::PrioritizedTrajectory, s::Symbol) = if s == :priority
+    t.priority
+else
+    getindex(t.traj, s)
+end
+
+const CircularArrayPSARTTrajectory = PrioritizedTrajectory{<:SumTree, <:CircularArraySARTTrajectory}
+
+CircularArrayPSARTTrajectory(;capacity, kwargs...) = PrioritizedTrajectory(
+    SumTree(capacity),
+    CircularArraySARTTrajectory(;capacity=capacity, kwargs...)
+)
 
 #####
 # Common

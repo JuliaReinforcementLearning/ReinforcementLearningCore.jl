@@ -76,7 +76,7 @@ function RLBase.update!(trajectory::AbstractTrajectory, policy::AbstractPolicy, 
     haskey(trajectory, :legal_actions_mask) && push!(trajectory[:legal_actions_mask], get_legal_actions_mask(env))
 end
 
-function RLBase.update!(trajectory::CircularArraySARTTrajectory, policy::AbstractPolicy, env::AbstractEnv, ::PreActStage, ::AbstractMode)
+function RLBase.update!(trajectory::AbstractTrajectory, policy::AbstractPolicy, env::AbstractEnv, ::PreActStage, ::AbstractMode)
     action = policy(env)
     push!(trajectory[:state], get_state(env))
     push!(trajectory[:action], action)

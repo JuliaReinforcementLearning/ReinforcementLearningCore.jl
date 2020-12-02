@@ -58,7 +58,7 @@ BatchSampler(batch_size::Int) = BatchSampler{SARTSA}(batch_size)
 
 function StatsBase.sample(rng::AbstractRNG, t::AbstractTrajectory, s::BatchSampler)
     inds = rand(rng, 1:length(t), s.batch_size)
-    sample(inds, t, s)
+    inds, sample(inds, t, s)
 end
 
 function StatsBase.sample(inds::Vector{Int}, t::CircularVectorSARTSATrajectory, s::BatchSampler{traces}) where traces
@@ -85,7 +85,23 @@ end
 
 function StatsBase.sample(rng::AbstractRNG, t::AbstractTrajectory, s::NStepBatchSampler)
     inds = rand(rng, 1:(length(t)-s.n+1), s.batch_size)
-    sample(inds, t, s)
+    inds, sample(inds, t, s)
+end
+
+function StatsBase.sample(rng::AbstractRNG, t::PrioritizedTrajectory{<:SumTree}, s::NStepBatchSampler)
+    bz, sz = s.batch_size, s.stack_size
+    inds = Vector{Int}(undef, bz)
+    priorities = Vector{Float32}(undef, bz)
+    valid_ind_range = isnothing(sz) ? (1:(length(t)-s.n+1)) : (sz:(length(t)-s.n+1))
+    for i in 1:bz
+        ind, p = sample(rng, t.priority)
+        while ind ∉ valid_ind_range
+            ind, p = sample(rng, t.priority)
+        end
+        inds[i] = ind
+        priorities[i] = p
+    end
+    inds, (priority=priorities, sample(inds, t.traj, s)...)
 end
 
 function StatsBase.sample(inds::Vector{Int}, traj::CircularArraySARTTrajectory, s::NStepBatchSampler{traces}) where traces
