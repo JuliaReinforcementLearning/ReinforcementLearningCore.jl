@@ -12,7 +12,6 @@ export AbstractStage,
     PRE_ACT_STAGE,
     POST_ACT_STAGE,
     set_mode!,
-    mode,
     AbstractMode,
     TrainMode,
     TRAIN_MODE,
@@ -60,6 +59,14 @@ const EVAL_MODE = EvalMode()
 struct TestMode <: AbstractMode end
 const TEST_MODE = TestMode()
 
-function mode end
+function set_mode!(p, ::TrainMode)
+    for x in Flux.trainable(p)
+        Flux.trainmode!(x)
+    end
+end
 
-function set_mode! end
+function set_mode!(p, ::Union{TestMode, EvalMode})
+    for x in Flux.trainable(p)
+        Flux.testmode!(x)
+    end
+end

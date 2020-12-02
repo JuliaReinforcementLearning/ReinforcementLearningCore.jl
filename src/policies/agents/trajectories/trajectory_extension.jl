@@ -32,11 +32,13 @@ end
 # Samplers
 #####
 
-abstract type AbstractSampler end
+abstract type AbstractSampler{traces} end
 
-struct UniformBatchSampler <: AbstractSampler
+struct UniformBatchSampler{traces} <: AbstractSampler{traces}
     batch_size::Int
 end
+
+UniformBatchSampler(batch_size::Int) = UniformBatchSampler{SARTSA}(batch_size)
 
 """
     sample([rng=Random.GLOBAL_RNG], trajectory, sampler, [traces=Val(keys(trajectory))])
@@ -46,16 +48,16 @@ end
     1. Each sample is independent of the original `trajectory` so that `trajectory` can be updated async.
     2. [Copy is not always so bad](https://docs.julialang.org/en/v1/manual/performance-tips/#Copying-data-is-not-always-bad).
 """
-function StatsBase.sample(t::AbstractTrajectory, sampler::AbstractSampler, traces=Val(keys(t)))
-    sample(Random.GLOBAL_RNG, t, sampler, traces)
+function StatsBase.sample(t::AbstractTrajectory, sampler::AbstractSampler)
+    sample(Random.GLOBAL_RNG, t, sampler)
 end
 
-function StatsBase.sample(rng::AbstractRNG, t::CircularVectorSARTSATrajectory, s::UniformBatchSampler, traces)
+function StatsBase.sample(rng::AbstractRNG, t::CircularVectorSARTSATrajectory, s::UniformBatchSampler{SARTSA})
     inds = rand(rng, 1:length(t), s.batch_size)
-    NamedTuple{traces}(Flux.batch(view(t[x], inds)) for x in traces)
+    NamedTuple{SARTSA}(Flux.batch(view(t[x], inds)) for x in SARTSA)
 end
 
-function StatsBase.sample(rng::AbstractRNG, t::CircularArraySARTTrajectory, s::UniformBatchSampler, ::Val{SARTS})
+function StatsBase.sample(rng::AbstractRNG, t::CircularArraySARTTrajectory, s::UniformBatchSampler{SARTS})
     inds = rand(rng, 1:length(t), s.batch_size)
     NamedTuple{SARTS}((
         (convert(Array, consecutive_view(t[x], inds)) for x in SART)...,

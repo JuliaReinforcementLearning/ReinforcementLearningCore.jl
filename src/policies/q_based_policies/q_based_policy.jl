@@ -18,6 +18,11 @@ end
 
 Flux.functor(x::QBasedPolicy) = (learner = x.learner,), y -> @set x.learner = y.learner
 
+function set_mode!(p::QBasedPolicy, m::AbstractMode)
+    @warn "setting a `QBasedPolicy` to $m, the inner `explorer` will not be modified!" maxlog=1
+    set_mode!(p.learner, m)
+end
+
 (π::QBasedPolicy)(env) = π(env, ActionStyle(env))
 (π::QBasedPolicy)(env, ::MinimalActionSet) = get_actions(env)[π.explorer(π.learner(env))]
 (π::QBasedPolicy)(env, ::FullActionSet) =
@@ -32,11 +37,6 @@ RLBase.get_prob(p::QBasedPolicy, env, ::FullActionSet) =
 @forward QBasedPolicy.learner RLBase.get_priority
 
 RLBase.update!(p::QBasedPolicy, trajectory::AbstractTrajectory) = update!(p.learner, trajectory)
-
-function Flux.testmode!(p::QBasedPolicy, mode = true)
-    testmode!(p.learner, mode)
-    testmode!(p.explorer, mode)
-end
 
 #####
 # TabularRandomPolicy

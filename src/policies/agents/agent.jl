@@ -26,11 +26,14 @@ end
 functor(x::Agent) = (policy = x.policy,), y -> @set x.policy = y.policy
 
 get_role(agent::Agent) = agent.role
-mode(agent::Agent) = agent.mode
-set_mode!(agent::Agent, mode::AbstractMode) = agent.mode = mode
+
+function set_mode!(agent::Agent, mode::AbstractMode)
+    agent.mode = mode
+    set_mode!(agent.policy, mode)
+end
 
 (agent::Agent)(env) = agent.policy(env)
-(agent::Agent)(stage::AbstractStage, env::AbstractEnv) = agent(env, stage, mode(agent))
+(agent::Agent)(stage::AbstractStage, env::AbstractEnv) = agent(env, stage, agent.mode)
 
 function (agent::Agent)(env::AbstractEnv, stage::AbstractStage, mode::AbstractMode)
     update!(agent.trajectory, agent.policy, env, stage, mode)

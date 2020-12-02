@@ -15,7 +15,3 @@ function (learner::AbstractLearner)(env) end
     get_priority(p::AbstractLearner, experience)
 """
 function RLBase.get_priority(p::AbstractLearner, experience) end
-
-# TODO: deprecate this default function
-Flux.testmode!(learner::AbstractLearner, mode = true) =
-    Flux.testmode!(learner.approximator, mode)
