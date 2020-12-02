@@ -8,15 +8,14 @@ struct StructTree{X}
     x::X
 end
 
-is_expand(x::T) where T = is_expand(T)
-is_expand(::Type{T}) where T = true
-
+is_expand(x) = true
 is_expand(::AbstractArray) = false
 is_expand(::AbstractDict) = false
 is_expand(::AbstractRNG) = false
 is_expand(::Progress) = false
 is_expand(::Function) = false
 is_expand(::UnionAll) = false
+is_expand(::DataType) = false
 
 function AT.children(t::StructTree{X}) where {X}
     if is_expand(t.x)

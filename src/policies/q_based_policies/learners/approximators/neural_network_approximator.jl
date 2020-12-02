@@ -18,9 +18,7 @@ Base.@kwdef struct NeuralNetworkApproximator{M,O} <: AbstractApproximator
     optimizer::O = nothing
 end
 
-function (app::NeuralNetworkApproximator)(x)
-    app.model(send_to_device(device(app.model), x))
-end
+(app::NeuralNetworkApproximator)(x) = app.model(x)
 
 functor(x::NeuralNetworkApproximator) =
     (model = x.model,), y -> NeuralNetworkApproximator(y.model, x.optimizer)
@@ -52,6 +50,3 @@ functor(x::ActorCritic) =
     (actor = x.actor, critic = x.critic), y -> ActorCritic(y.actor, y.critic, x.optimizer)
 
 RLBase.update!(app::ActorCritic, gs) = Flux.Optimise.update!(app.optimizer, params(app), gs)
-
-actor(ac::ActorCritic) = x -> ac.actor(send_to_device(device(ac.actor), x))
-critic(ac::ActorCritic) = x -> ac.critic(send_to_device(device(ac.actor), x))
