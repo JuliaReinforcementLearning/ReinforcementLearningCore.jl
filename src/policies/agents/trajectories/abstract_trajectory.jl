@@ -1,7 +1,9 @@
 export AbstractTrajectory,
     SART,
     SARTS,
-    SARTSA
+    SARTSA,
+    SLARTSL,
+    SLARTSLA
 
 """
     AbstractTrajectory

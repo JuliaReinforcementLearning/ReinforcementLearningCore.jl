@@ -58,14 +58,14 @@ BatchSampler(batch_size::Int) = BatchSampler{SARTSA}(batch_size)
 
 function StatsBase.sample(rng::AbstractRNG, t::AbstractTrajectory, s::BatchSampler)
     inds = rand(rng, 1:length(t), s.batch_size)
-    inds, sample(inds, t, s)
+    inds, select(inds, t, s)
 end
 
-function StatsBase.sample(inds::Vector{Int}, t::CircularVectorSARTSATrajectory, s::BatchSampler{traces}) where traces
+function select(inds::Vector{Int}, t::CircularVectorSARTSATrajectory, s::BatchSampler{traces}) where traces
     NamedTuple{SARTSA}(Flux.batch(view(t[x], inds)) for x in traces)
 end
 
-function StatsBase.sample(inds::Vector{Int}, t::CircularArraySARTTrajectory, s::BatchSampler{SARTS})
+function select(inds::Vector{Int}, t::CircularArraySARTTrajectory, s::BatchSampler{SARTS})
     NamedTuple{SARTS}((
         (convert(Array, consecutive_view(t[x], inds)) for x in SART)...,
         convert(Array,consecutive_view(t[:state], inds.+1))
@@ -85,7 +85,7 @@ end
 
 function StatsBase.sample(rng::AbstractRNG, t::AbstractTrajectory, s::NStepBatchSampler)
     inds = rand(rng, 1:(length(t)-s.n+1), s.batch_size)
-    inds, sample(inds, t, s)
+    inds, select(inds, t, s)
 end
 
 function StatsBase.sample(rng::AbstractRNG, t::PrioritizedTrajectory{<:SumTree}, s::NStepBatchSampler)
@@ -101,10 +101,10 @@ function StatsBase.sample(rng::AbstractRNG, t::PrioritizedTrajectory{<:SumTree},
         inds[i] = ind
         priorities[i] = p
     end
-    inds, (priority=priorities, sample(inds, t.traj, s)...)
+    inds, (priority=priorities, select(inds, t.traj, s)...)
 end
 
-function StatsBase.sample(inds::Vector{Int}, traj::CircularArraySARTTrajectory, s::NStepBatchSampler{traces}) where traces
+function select(inds::Vector{Int}, traj::CircularArraySARTTrajectory, s::NStepBatchSampler{traces}) where traces
     γ, n, bz, sz = s.γ, s.n, s.batch_size, s.stack_size
     next_inds = inds .+ n
 

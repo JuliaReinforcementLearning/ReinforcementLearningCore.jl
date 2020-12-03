@@ -16,7 +16,7 @@ update the trajectory and policy appropriately in different stages and modes.
 - `trajectory`::[`AbstractTrajectory`](@ref): used to store transitions between an agent and an environment
 - `role=RLBase.DEFAULT_PLAYER`: used to distinguish different agents
 """
-Base.@kwdef mutable struct Agent{P<:AbstractPolicy,T<:AbstractTrajectory,R} <: AbstractPolicy
+Base.@kwdef struct Agent{P<:AbstractPolicy,T<:AbstractTrajectory,R} <: AbstractPolicy
     policy::P
     trajectory::T = DUMMY_TRAJECTORY
     role::R = RLBase.DEFAULT_PLAYER
@@ -27,11 +27,6 @@ functor(x::Agent) = (policy = x.policy,), y -> @set x.policy = y.policy
 
 get_role(agent::Agent) = agent.role
 
-function set_mode!(agent::Agent, mode::AbstractMode)
-    agent.mode = mode
-    set_mode!(agent.policy, mode)
-end
-
 (agent::Agent)(env) = agent.policy(env)
 (agent::Agent)(stage::AbstractStage, env::AbstractEnv) = agent(env, stage, agent.mode)
 
@@ -40,7 +35,7 @@ function (agent::Agent)(env::AbstractEnv, stage::AbstractStage, mode::AbstractMo
     update!(agent.policy, agent.trajectory, env, stage, mode)
 end
 
-## TrainMode
+## TrainMode: update both policy and trajectory
 
 function (agent::Agent)(env::AbstractEnv, stage::PreActStage, mode::TrainMode)
     action = update!(agent.trajectory, agent.policy, env, stage, mode)
@@ -48,13 +43,13 @@ function (agent::Agent)(env::AbstractEnv, stage::PreActStage, mode::TrainMode)
     action
 end
 
-## EvalMode
+## EvalMode: upate only trajectory
 
 function (agent::Agent)(env::AbstractEnv, stage::PreActStage, mode::EvalMode)
     update!(agent.trajectory, agent.policy, env, stage, mode)
 end
 
-## TestMode
+## TestMode: do not update
 
 (agent::Agent)(::AbstractEnv, ::AbstractStage, ::TestMode) = nothing
 (agent::Agent)(env::AbstractEnv, ::PreActStage, ::TestMode) = agent.policy(env)

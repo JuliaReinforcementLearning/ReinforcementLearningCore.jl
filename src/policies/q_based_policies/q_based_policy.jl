@@ -18,11 +18,6 @@ end
 
 Flux.functor(x::QBasedPolicy) = (learner = x.learner,), y -> @set x.learner = y.learner
 
-function set_mode!(p::QBasedPolicy, m::AbstractMode)
-    @warn "setting a `QBasedPolicy` to $m, the inner `explorer` will not be modified!" maxlog=1
-    set_mode!(p.learner, m)
-end
-
 (π::QBasedPolicy)(env) = π(env, ActionStyle(env))
 (π::QBasedPolicy)(env, ::MinimalActionSet) = get_actions(env)[π.explorer(π.learner(env))]
 (π::QBasedPolicy)(env, ::FullActionSet) =
