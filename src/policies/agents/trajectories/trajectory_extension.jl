@@ -94,7 +94,7 @@ end
 
 function StatsBase.sample(
     rng::AbstractRNG,
-    t::PrioritizedTrajectory{<:SumTree},
+    t::PrioritizedTrajectory,
     s::NStepBatchSampler,
 )
     bz, sz = s.batch_size, s.stack_size
