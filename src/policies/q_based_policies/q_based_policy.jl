@@ -23,13 +23,13 @@ Flux.functor(x::QBasedPolicy) = (learner = x.learner,), y -> @set x.learner = y.
 (π::QBasedPolicy)(env, ::FullActionSet) =
     get_actions(env)[π.explorer(π.learner(env), get_legal_actions_mask(env))]
 
-RLBase.get_prob(p::QBasedPolicy, env) = get_prob(p, env, ActionStyle(env))
-RLBase.get_prob(p::QBasedPolicy, env, ::MinimalActionSet) =
+RLBase.prob(p::QBasedPolicy, env) = get_prob(p, env, ActionStyle(env))
+RLBase.prob(p::QBasedPolicy, env, ::MinimalActionSet) =
     get_prob(p.explorer, p.learner(env))
-RLBase.get_prob(p::QBasedPolicy, env, ::FullActionSet) =
+RLBase.prob(p::QBasedPolicy, env, ::FullActionSet) =
     get_prob(p.explorer, p.learner(env), get_legal_actions_mask(env))
 
-@forward QBasedPolicy.learner RLBase.get_priority
+@forward QBasedPolicy.learner RLBase.priority
 
 RLBase.update!(p::QBasedPolicy, trajectory::AbstractTrajectory) =
     update!(p.learner, trajectory)
@@ -61,7 +61,7 @@ function (p::TabularRandomPolicy)(env::AbstractEnv)
     p(env, ActionStyle(env))  # fall back to general implementation above
 end
 
-function RLBase.get_prob(p::TabularRandomPolicy, env, ::FullActionSet)
+function RLBase.prob(p::TabularRandomPolicy, env, ::FullActionSet)
     m = get_legal_actions_mask(env)
     prob = zeros(length(m))
     prob[m] .= p.learner(env)
