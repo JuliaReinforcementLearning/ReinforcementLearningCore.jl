@@ -33,7 +33,7 @@ function _run(
         policy(PRE_EPISODE_STAGE, env)
         hook(PRE_EPISODE_STAGE, policy, env)
 
-        while !get_terminal(env) # one episode
+        while !is_terminated(env) # one episode
             action = policy(PRE_ACT_STAGE, env)
             hook(PRE_ACT_STAGE, policy, env, action)
 
