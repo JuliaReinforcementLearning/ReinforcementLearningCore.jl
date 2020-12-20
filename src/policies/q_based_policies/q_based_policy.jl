@@ -35,9 +35,9 @@ RLBase.update!(p::QBasedPolicy, trajectory::AbstractTrajectory) =
 
 function check(p::QBasedPolicy, env::AbstractEnv)
     A = action_space(env)
-    if A isa Base.OneTo || 
-        (A isa AbstractVector && A == 1:length(A)) ||
+    if (A isa AbstractVector && A == 1:length(A)) ||
         (A isa Tuple && A == Tuple(1:length(A)))
+        # this is expected
     else
         @warn "Applying a QBasedPolicy to an environment with a unknown action space. Maybe convert the environment with `discrete2standard_discrete` in ReinforcementLearningEnvironments.jl first or redesign the environment."
     end
