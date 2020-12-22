@@ -31,31 +31,44 @@ function check(agent::Agent, env::AbstractEnv)
     check(agent.policy, env)
 end
 
-#####
-# update!
-#####
-
+"""
+abstract update agent and trajectory
+"""
 function (agent::Agent)(stage::AbstractStage, env::AbstractEnv)
     update!(agent.trajectory, agent.policy, env, stage)
     update!(agent.policy, agent.trajectory, env, stage)
 end
 
+"""
+update agent and trajectory before an action
+"""
 function (agent::Agent)(stage::PreActStage, env::AbstractEnv)
     action = update!(agent.trajectory, agent.policy, env, stage)
     update!(agent.policy, agent.trajectory, env, stage)
     action
 end
 
+"""
+abstract update policy
+"""
 RLBase.update!(::AbstractPolicy, ::AbstractTrajectory, ::AbstractEnv, ::AbstractStage) =
     nothing
+
+"""
+update policy for before an action
+"""
 RLBase.update!(p::AbstractPolicy, t::AbstractTrajectory, ::AbstractEnv, ::PreActStage) =
     update!(p, t)
 
-## update trajectory
-
+"""
+abstract update trajectory
+"""
 RLBase.update!(::AbstractTrajectory, ::AbstractPolicy, ::AbstractEnv, ::AbstractStage) =
     nothing
 
+"""
+update SART trajectory before an episode
+"""
 function RLBase.update!(
     trajectory::Union{
         CircularArraySARTTrajectory,
@@ -71,6 +84,9 @@ function RLBase.update!(
     end
 end
 
+"""
+update SLART trajectory before an episode
+"""
 function RLBase.update!(
     trajectory::Union{
         CircularArraySLARTTrajectory,
@@ -87,6 +103,9 @@ function RLBase.update!(
     end
 end
 
+"""
+update SART trajectory after an episode, or before an action.
+"""
 function RLBase.update!(
     trajectory::Union{
         CircularArraySARTTrajectory,
@@ -102,6 +121,9 @@ function RLBase.update!(
     action
 end
 
+"""
+update SLART trajectory after an episode, or before an action.
+"""
 function RLBase.update!(
     trajectory::Union{
         CircularArraySLARTTrajectory,
@@ -118,6 +140,9 @@ function RLBase.update!(
     action
 end
 
+"""
+update trajectory after an action.
+"""
 function RLBase.update!(
     trajectory::AbstractTrajectory,
     ::AbstractPolicy,
