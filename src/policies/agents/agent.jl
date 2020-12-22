@@ -43,7 +43,7 @@ may customize these behaviors respectively. The default behaviors are:
      **action** is returned.
   3. In `PostActStage`, we query the `reward` and `is_terminated` info from
      `env` and push them into `trajectory`.
-  4. For `CircularSARTTrajectory`:  
+  4. For `CircularSARTTrajectory`:
      1. In the `PosEpisodeStage`, we push the `state` at the end of an episode
         and a dummy action into the `trajectory`.
      1. In the `PreEpisodeStage`, we pop out the lastest `state` and `action`
@@ -58,36 +58,21 @@ function (agent::Agent)(stage::AbstractStage, env::AbstractEnv)
     update!(agent.policy, agent.trajectory, env, stage)
 end
 
-"""
-update agent and trajectory before an action
-"""
 function (agent::Agent)(stage::PreActStage, env::AbstractEnv)
     action = update!(agent.trajectory, agent.policy, env, stage)
     update!(agent.policy, agent.trajectory, env, stage)
     action
 end
 
-"""
-abstract update policy
-"""
 RLBase.update!(::AbstractPolicy, ::AbstractTrajectory, ::AbstractEnv, ::AbstractStage) =
     nothing
 
-"""
-update policy for before an action
-"""
 RLBase.update!(p::AbstractPolicy, t::AbstractTrajectory, ::AbstractEnv, ::PreActStage) =
     update!(p, t)
 
-"""
-abstract update trajectory
-"""
 RLBase.update!(::AbstractTrajectory, ::AbstractPolicy, ::AbstractEnv, ::AbstractStage) =
     nothing
 
-"""
-update SART trajectory before an episode
-"""
 function RLBase.update!(
     trajectory::Union{
         CircularArraySARTTrajectory,
@@ -103,9 +88,6 @@ function RLBase.update!(
     end
 end
 
-"""
-update SLART trajectory before an episode
-"""
 function RLBase.update!(
     trajectory::Union{
         CircularArraySLARTTrajectory,
@@ -122,9 +104,6 @@ function RLBase.update!(
     end
 end
 
-"""
-update SART trajectory after an episode, or before an action.
-"""
 function RLBase.update!(
     trajectory::Union{
         CircularArraySARTTrajectory,
@@ -140,9 +119,6 @@ function RLBase.update!(
     action
 end
 
-"""
-update SLART trajectory after an episode, or before an action.
-"""
 function RLBase.update!(
     trajectory::Union{
         CircularArraySLARTTrajectory,
@@ -159,9 +135,6 @@ function RLBase.update!(
     action
 end
 
-"""
-update trajectory after an action.
-"""
 function RLBase.update!(
     trajectory::AbstractTrajectory,
     ::AbstractPolicy,
