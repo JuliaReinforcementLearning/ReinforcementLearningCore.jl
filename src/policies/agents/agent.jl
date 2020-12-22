@@ -76,21 +76,8 @@ RLBase.update!(::AbstractTrajectory, ::AbstractPolicy, ::AbstractEnv, ::Abstract
 function RLBase.update!(
     trajectory::Union{
         CircularArraySARTTrajectory,
-        PrioritizedTrajectory{<:CircularArraySARTTrajectory},
-    },
-    ::AbstractPolicy,
-    ::AbstractEnv,
-    ::PreEpisodeStage,
-)
-    if length(trajectory) > 0
-        pop!(trajectory[:state])
-        pop!(trajectory[:action])
-    end
-end
-
-function RLBase.update!(
-    trajectory::Union{
         CircularArraySLARTTrajectory,
+        PrioritizedTrajectory{<:CircularArraySARTTrajectory},
         PrioritizedTrajectory{<:CircularArraySLARTTrajectory},
     },
     ::AbstractPolicy,
@@ -100,28 +87,17 @@ function RLBase.update!(
     if length(trajectory) > 0
         pop!(trajectory[:state])
         pop!(trajectory[:action])
-        pop!(trajectory[:legal_actions_mask])
+        if :legal_actions_mask in keys(trajectory)
+            pop!(trajectory[:legal_actions_mask])
+        end
     end
 end
 
 function RLBase.update!(
     trajectory::Union{
         CircularArraySARTTrajectory,
-        PrioritizedTrajectory{<:CircularArraySARTTrajectory},
-    },
-    policy::AbstractPolicy,
-    env::AbstractEnv,
-    ::Union{PreActStage,PostEpisodeStage},
-)
-    action = policy(env)
-    push!(trajectory[:state], state(env))
-    push!(trajectory[:action], action)
-    action
-end
-
-function RLBase.update!(
-    trajectory::Union{
         CircularArraySLARTTrajectory,
+        PrioritizedTrajectory{<:CircularArraySARTTrajectory},
         PrioritizedTrajectory{<:CircularArraySLARTTrajectory},
     },
     policy::AbstractPolicy,
@@ -131,7 +107,9 @@ function RLBase.update!(
     action = policy(env)
     push!(trajectory[:state], state(env))
     push!(trajectory[:action], action)
-    push!(trajectory[:legal_actions_mask], legal_action_space_mask(env))
+    if :legal_actions_mask in keys(trajectory)
+        push!(trajectory[:legal_actions_mask], legal_action_space_mask(env))
+    end
     action
 end
 
