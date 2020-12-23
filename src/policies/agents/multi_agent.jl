@@ -19,7 +19,7 @@ environment from their own perspective and get updated independently. For
 environments of `SEQUENTIAL` style, agents which are not the current player will
 observe a dummy action of [`NO_OP`](@ref) in the `PreActStage`.
 """
-MultiAgent(named_agent_pairs::Pair...) = MultiAgent(Dict(x => NamedPolicy(x=>p) for (x,p) in named_agent_pairs))
+MultiAgent(policies...) = MultiAgent(Dict(nameof(p) => p for p in policies))
 
 (A::MultiAgent)(env::AbstractEnv) = A(env, DynamicStyle(env))
 (A::MultiAgent)(env::AbstractEnv, ::Sequential) = A[current_player(env)](env)

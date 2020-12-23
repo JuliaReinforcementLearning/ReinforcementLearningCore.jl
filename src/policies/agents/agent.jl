@@ -135,7 +135,7 @@ function RLBase.update!(
         PrioritizedTrajectory{<:CircularArraySARTTrajectory},
         PrioritizedTrajectory{<:CircularArraySLARTTrajectory},
     },
-    policy::NamedAgent,
+    policy::NamedPolicy,
     env::AbstractEnv,
     ::PreActStage,
     action
@@ -178,12 +178,11 @@ function RLBase.update!(
         PrioritizedTrajectory{<:CircularArraySARTTrajectory},
         PrioritizedTrajectory{<:CircularArraySLARTTrajectory},
     },
-    policy::NamedAgent,
+    policy::NamedPolicy,
     env::AbstractEnv,
     ::PostEpisodeStage,
 )
     action = rand(action_space(env))
-
     push!(trajectory[:state], state(env, nameof(policy)))
     push!(trajectory[:action], action)
     if haskey(trajectory, :legal_actions_mask)
@@ -204,7 +203,7 @@ end
 
 function RLBase.update!(
     trajectory::AbstractTrajectory,
-    policy::NamedAgent,
+    policy::NamedPolicy,
     env::AbstractEnv,
     ::PostActStage,
 )
