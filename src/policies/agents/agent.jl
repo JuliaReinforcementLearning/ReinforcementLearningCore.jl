@@ -135,6 +135,25 @@ function RLBase.update!(
         PrioritizedTrajectory{<:CircularArraySARTTrajectory},
         PrioritizedTrajectory{<:CircularArraySLARTTrajectory},
     },
+    policy::NamedAgent,
+    env::AbstractEnv,
+    ::PreActStage,
+    action
+)
+    push!(trajectory[:state], state(env, nameof(policy)))
+    push!(trajectory[:action], action)
+    if haskey(trajectory, :legal_actions_mask)
+        push!(trajectory[:legal_actions_mask], legal_action_space_mask(env, nameof(policy)))
+    end
+end
+
+function RLBase.update!(
+    trajectory::Union{
+        CircularArraySARTTrajectory,
+        CircularArraySLARTTrajectory,
+        PrioritizedTrajectory{<:CircularArraySARTTrajectory},
+        PrioritizedTrajectory{<:CircularArraySLARTTrajectory},
+    },
     policy::AbstractPolicy,
     env::AbstractEnv,
     ::PostEpisodeStage,
@@ -153,11 +172,42 @@ function RLBase.update!(
 end
 
 function RLBase.update!(
+    trajectory::Union{
+        CircularArraySARTTrajectory,
+        CircularArraySLARTTrajectory,
+        PrioritizedTrajectory{<:CircularArraySARTTrajectory},
+        PrioritizedTrajectory{<:CircularArraySLARTTrajectory},
+    },
+    policy::NamedAgent,
+    env::AbstractEnv,
+    ::PostEpisodeStage,
+)
+    action = rand(action_space(env))
+
+    push!(trajectory[:state], state(env, nameof(policy)))
+    push!(trajectory[:action], action)
+    if haskey(trajectory, :legal_actions_mask)
+        push!(trajectory[:legal_actions_mask], legal_action_space_mask(env, nameof(policy)))
+    end
+end
+
+
+function RLBase.update!(
     trajectory::AbstractTrajectory,
     ::AbstractPolicy,
     env::AbstractEnv,
     ::PostActStage,
 )
     push!(trajectory[:reward], reward(env))
+    push!(trajectory[:terminal], is_terminated(env))
+end
+
+function RLBase.update!(
+    trajectory::AbstractTrajectory,
+    policy::NamedAgent,
+    env::AbstractEnv,
+    ::PostActStage,
+)
+    push!(trajectory[:reward], reward(env, nameof(policy)))
     push!(trajectory[:terminal], is_terminated(env))
 end
