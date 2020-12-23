@@ -31,6 +31,8 @@ function check(agent::Agent, env::AbstractEnv)
     check(agent.policy, env)
 end
 
+Base.nameof(agent::Agent) = nameof(agent.policy)
+
 #####
 # Default behaviors
 #####
