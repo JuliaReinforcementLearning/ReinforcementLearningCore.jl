@@ -13,7 +13,7 @@ struct NamedPolicy{P,N} <: AbstractPolicy
     policy::P
 end
 
-NamedPolicy((name,policy)) = NamedPolicy(policy, name)
+NamedPolicy((name,policy)) = NamedPolicy(name, policy)
 
 functor(x::NamedPolicy) = (policy = x.policy,), y -> @set x.policy = y.policy
 
@@ -24,3 +24,5 @@ function check(agent::NamedPolicy, env::AbstractEnv)
 end
 
 RLBase.update!(p::NamedPolicy, args...) = update!(p.policy, args...)
+
+(p::NamedPolicy)(env::AbstractEnv) = p.policy(env)
