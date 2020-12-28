@@ -138,7 +138,7 @@ function (hook::TotalRewardPerEpisode)(::PostActStage, agent, env)
     hook.reward += reward(env)
 end
 
-function (hook::TotalRewardPerEpisode)(::PostActStage, agent::NamedTuple, env)
+function (hook::TotalRewardPerEpisode)(::PostActStage, agent::NamedPolicy, env)
     hook.reward += reward(env, nameof(agent))
 end
 
@@ -328,8 +328,8 @@ MultiAgentHook(player_hook_pair::Pair...) = MultiAgentHook(Dict(player_hook_pair
 
 Base.getindex(h::MultiAgentHook, p) = getindex(h.hooks, p)
 
-function (hook::MultiAgentHook)(s::AbstractStage, p::AbstractPolicy, env::AbstractEnv, args...)
-    for (p, h) in hook.hooks
+function (hook::MultiAgentHook)(s::AbstractStage, m::MultiAgentManager, env::AbstractEnv, args...)
+    for (p, h) in zip(values(m.agents), values(hook.hooks))
         h(s, p, env, args...)
     end
 end

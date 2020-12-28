@@ -66,22 +66,3 @@ function check(p::QBasedPolicy, env::AbstractEnv)
     check(p.learner, env)
     check(p.explorer, env)
 end
-
-#####
-# TabularRandomPolicy
-#####
-
-const TabularRandomPolicy = QBasedPolicy{<:TabularLearner,<:WeightedExplorer}
-
-function TabularRandomPolicy(;
-    rng = Random.GLOBAL_RNG,
-    is_normalized = true,
-    table = Dict{String,Vector{Float64}}(),
-)
-    QBasedPolicy(;
-        learner = TabularLearner(table),
-        explorer = WeightedExplorer(; is_normalized = is_normalized, rng = rng),
-    )
-end
-
-RLBase.prob(p::TabularRandomPolicy, env::AbstractEnv) = p.learner(env)
