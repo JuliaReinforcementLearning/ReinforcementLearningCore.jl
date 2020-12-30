@@ -1,16 +1,11 @@
 export VBasedPolicy
 
-function default_value_action_mapping(env, value_learner)
+function default_value_action_mapping(env, value_learner;explorer=GreedyExplorer())
     A = legal_action_space(env)
-    a, v = A[1], -Inf
-    for a′ in A
-        v′ = value_learner(child(env, a))
-        if v′ > v
-            a = a′
-            v = v′
-        end
+    V = map(A) do a
+        value_learner(child(env, a))
     end
-    a
+    A[explorer(V)]
 end
 
 """
@@ -26,5 +21,3 @@ Base.@kwdef struct VBasedPolicy{L, M} <: AbstractPolicy
 end
 
 (p::VBasedPolicy)(env::AbstractEnv) = p.mapping(env, p.learner)
-
-RLBase.update!(p::VBasedPolicy, args...) = update!(p.learner, args...)

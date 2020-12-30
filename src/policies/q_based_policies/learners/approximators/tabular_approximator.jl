@@ -1,7 +1,7 @@
 export TabularApproximator, TabularVApproximator, TabularQApproximator
 
 """
-    TabularApproximator(table<:AbstractArray)
+    TabularApproximator(table<:AbstractArray, opt)
 
 For `table` of 1-d, it will serve as a state value approximator.
 For `table` of 2-d, it will serve as a state-action value approximator.
@@ -22,8 +22,8 @@ end
 const TabularVApproximator = TabularApproximator{1}
 const TabularQApproximator = TabularApproximator{2}
 
-TabularVApproximator(;n_state, init=0.0, opt=Descent()) = TabularApproximator(fill(init, n_state), opt)
-TabularQApproximator(;n_state, n_action, init=0.0, opt=Descent()) = TabularApproximator(fill(init, n_action, n_state), opt)
+TabularVApproximator(;n_state, init=0.0, opt=InvDecay(1.0)) = TabularApproximator(fill(init, n_state), opt)
+TabularQApproximator(;n_state, n_action, init=0.0, opt=InvDecay(1.0)) = TabularApproximator(fill(init, n_action, n_state), opt)
 
 (app::TabularVApproximator)(s::Int) = @views app.table[s]
 
@@ -33,13 +33,15 @@ TabularQApproximator(;n_state, n_action, init=0.0, opt=Descent()) = TabularAppro
 function RLBase.update!(app::TabularVApproximator, correction::Pair{Int, Float64})
     s, e = correction
     x = @view app.table[s]
-    Flux.Optimise.update!(app.optimizer, x, [e])
+    x̄ = @view [e][1]
+    Flux.Optimise.update!(app.optimizer, x, x̄)
 end
 
 function RLBase.update!(app::TabularQApproximator, correction::Pair{Tuple{Int,Int}, Float64})
     (s, a), e = correction
     x = @view app.table[a, s]
-    Flux.Optimise.update!(app.optimizer, x, [e])
+    x̄ = @view [e][1]
+    Flux.Optimise.update!(app.optimizer, x, x̄)
 end
 
 function RLBase.update!(app::TabularQApproximator, correction::Pair{Int,Vector{Float64}})

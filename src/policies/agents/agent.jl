@@ -90,24 +90,16 @@ function RLBase.update!(
     update!(p, t)
 end
 
+#####
+# Default behaviors for known trajectories
+#####
+
 function RLBase.update!(
     ::AbstractTrajectory,
     ::AbstractPolicy,
     ::AbstractEnv,
     ::AbstractStage,
 ) end
-
-function RLBase.update!(
-    ::AbstractTrajectory,
-    ::AbstractPolicy,
-    ::AbstractEnv,
-    ::PreActStage,
-    action,
-) end
-
-#####
-# Default behaviors for known trajectories
-#####
 
 function RLBase.update!(
     trajectory::Union{
@@ -131,6 +123,7 @@ end
 
 function RLBase.update!(
     trajectory::Union{
+        VectorSARTTrajectory,
         CircularArraySARTTrajectory,
         CircularArraySLARTTrajectory,
         PrioritizedTrajectory{<:CircularArraySARTTrajectory},
@@ -150,6 +143,7 @@ end
 
 function RLBase.update!(
     trajectory::Union{
+        VectorSARTTrajectory,
         CircularArraySARTTrajectory,
         CircularArraySLARTTrajectory,
         PrioritizedTrajectory{<:CircularArraySARTTrajectory},
@@ -169,6 +163,7 @@ end
 
 function RLBase.update!(
     trajectory::Union{
+        VectorSARTTrajectory,
         CircularArraySARTTrajectory,
         CircularArraySLARTTrajectory,
         PrioritizedTrajectory{<:CircularArraySARTTrajectory},
@@ -193,6 +188,7 @@ end
 
 function RLBase.update!(
     trajectory::Union{
+        VectorSARTTrajectory,
         CircularArraySARTTrajectory,
         CircularArraySLARTTrajectory,
         PrioritizedTrajectory{<:CircularArraySARTTrajectory},
