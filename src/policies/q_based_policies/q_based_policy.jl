@@ -51,8 +51,14 @@ end
 
 @forward QBasedPolicy.learner RLBase.priority
 
-RLBase.update!(p::QBasedPolicy, trajectory) =
-    update!(p.learner, trajectory)
+function RLBase.update!(
+    p::QBasedPolicy,
+    t::AbstractTrajectory,
+    e::AbstractEnv,
+    s::AbstractStage
+)
+    update!(p.learner, t, e, s)
+end
 
 function check(p::QBasedPolicy, env::AbstractEnv)
     A = action_space(env)

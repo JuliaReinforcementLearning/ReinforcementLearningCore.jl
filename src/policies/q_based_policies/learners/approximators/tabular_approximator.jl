@@ -28,7 +28,7 @@ TabularQApproximator(;n_state, n_action, init=0.0, opt=InvDecay(1.0)) = TabularA
 (app::TabularVApproximator)(s::Int) = @views app.table[s]
 
 (app::TabularQApproximator)(s::Int) = @views app.table[:, s]
-(app::TabularQApproximator)(s::Int, a::Int) = app[a, s]
+(app::TabularQApproximator)(s::Int, a::Int) = app.table[a, s]
 
 function RLBase.update!(app::TabularVApproximator, correction::Pair{Int, Float64})
     s, e = correction
@@ -46,6 +46,6 @@ end
 
 function RLBase.update!(app::TabularQApproximator, correction::Pair{Int,Vector{Float64}})
     s, errors = correction
-    x = @view app.table[s, :]
+    x = @view app.table[:, s]
     Flux.Optimise.update!(app.optimizer, x, errors)
 end

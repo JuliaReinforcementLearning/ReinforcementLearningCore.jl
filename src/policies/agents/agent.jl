@@ -81,15 +81,6 @@ function RLBase.update!(
     ::AbstractStage,
 ) end
 
-function RLBase.update!(
-    p::AbstractPolicy,
-    t::AbstractTrajectory,
-    ::AbstractEnv,
-    ::PreActStage,
-)
-    update!(p, t)
-end
-
 #####
 # Default behaviors for known trajectories
 #####
