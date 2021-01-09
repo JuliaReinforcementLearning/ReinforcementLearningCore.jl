@@ -21,3 +21,12 @@ Base.@kwdef struct VBasedPolicy{L, M} <: AbstractPolicy
 end
 
 (p::VBasedPolicy)(env::AbstractEnv) = p.mapping(env, p.learner)
+
+function RLBase.update!(
+    p::VBasedPolicy,
+    t::AbstractTrajectory,
+    e::AbstractEnv,
+    s::AbstractStage
+)
+    update!(p.learner, t, e, s)
+end
