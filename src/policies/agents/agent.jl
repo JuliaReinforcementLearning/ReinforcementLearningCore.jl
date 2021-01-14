@@ -55,7 +55,7 @@ The default behaviors for `Agent` are:
   3. In `PostActStage`, we query the `reward` and `is_terminated` info from
      `env` and push them into `trajectory`.
   4. For `CircularSARTTrajectory`:
-     1. In the `PosEpisodeStage`, we push the `state` at the end of an episode
+     1. In the `PostEpisodeStage`, we push the `state` at the end of an episode
         and a dummy action into the `trajectory`.
      1. In the `PreEpisodeStage`, we pop out the lastest `state` and `action`
         pair (which are dummy ones) from `trajectory`.
@@ -130,6 +130,22 @@ function RLBase.update!(
 end
 
 function RLBase.update!(
+    trajectory::CircularArraySGARTTrajectory,
+    ::AbstractPolicy,
+    ::AbstractEnv,
+    ::PreEpisodeStage,
+)
+    if length(trajectory) > 0
+        pop!(trajectory[:state])
+        pop!(trajectory[:goal])
+        pop!(trajectory[:action])
+        if haskey(trajectory, :legal_actions_mask)
+            pop!(trajectory[:legal_actions_mask])
+        end
+    end
+end
+
+function RLBase.update!(
     trajectory::Union{
         CircularArraySARTTrajectory,
         CircularArraySLARTTrajectory,
@@ -142,6 +158,21 @@ function RLBase.update!(
     action,
 )
     push!(trajectory[:state], state(env))
+    push!(trajectory[:action], action)
+    if haskey(trajectory, :legal_actions_mask)
+        push!(trajectory[:legal_actions_mask], legal_action_space_mask(env))
+    end
+end
+
+function RLBase.update!(
+    trajectory::CircularArraySGARTTrajectory,
+    policy::AbstractPolicy,
+    env::AbstractEnv,
+    ::PreActStage,
+    action,
+)
+    push!(trajectory[:state], state(env))
+    push!(trajectory[:goal], state(env,GoalState()))
     push!(trajectory[:action], action)
     if haskey(trajectory, :legal_actions_mask)
         push!(trajectory[:legal_actions_mask], legal_action_space_mask(env))
@@ -164,6 +195,21 @@ function RLBase.update!(
     push!(trajectory[:action], action)
     if haskey(trajectory, :legal_actions_mask)
         push!(trajectory[:legal_actions_mask], legal_action_space_mask(env, nameof(policy)))
+    end
+end
+
+function RLBase.update!(
+    trajectory::CircularArraySGARTTrajectory,
+    policy::NamedPolicy,
+    env::AbstractEnv,
+    ::PreActStage,
+    action,
+)
+    push!(trajectory[:state], state(env, nameof(policy)))
+    push!(trajectory[:goal], state(env,GoalState()))
+    push!(trajectory[:action], action)
+    if haskey(trajectory, :legal_actions_mask)
+        push!(trajectory[:legal_actions_mask], legal_action_space_mask(env))
     end
 end
 
@@ -192,6 +238,26 @@ function RLBase.update!(
 end
 
 function RLBase.update!(
+    trajectory::CircularArraySGARTTrajectory,
+    policy::AbstractPolicy,
+    env::AbstractEnv,
+    ::PostEpisodeStage,
+)
+    # Note that for trajectories like `CircularArraySARTTrajectory`, data are
+    # stored in a SARSA format, which means we still need to generate a dummy
+    # action at the end of an episode. Here we simply select a random one using
+    # the global rng. In theory it shouldn't affect the performance of specific algorithm.
+    action = rand(action_space(env))
+
+    push!(trajectory[:state], state(env))
+    push!(trajectory[:goal], state(env,GoalState()))
+    push!(trajectory[:action], action)
+    if haskey(trajectory, :legal_actions_mask)
+        push!(trajectory[:legal_actions_mask], legal_action_space_mask(env))
+    end
+end
+
+function RLBase.update!(
     trajectory::Union{
         CircularArraySARTTrajectory,
         CircularArraySLARTTrajectory,
@@ -204,6 +270,21 @@ function RLBase.update!(
 )
     action = rand(action_space(env))
     push!(trajectory[:state], state(env, nameof(policy)))
+    push!(trajectory[:action], action)
+    if haskey(trajectory, :legal_actions_mask)
+        push!(trajectory[:legal_actions_mask], legal_action_space_mask(env, nameof(policy)))
+    end
+end
+
+function RLBase.update!(
+    trajectory::CircularArraySGARTTrajectory,
+    policy::NamedPolicy,
+    env::AbstractEnv,
+    ::PostEpisodeStage,
+)
+    action = rand(action_space(env))
+    push!(trajectory[:state], state(env, nameof(policy)))
+    push!(trajectory[:goal], state(env, GoalState()))
     push!(trajectory[:action], action)
     if haskey(trajectory, :legal_actions_mask)
         push!(trajectory[:legal_actions_mask], legal_action_space_mask(env, nameof(policy)))

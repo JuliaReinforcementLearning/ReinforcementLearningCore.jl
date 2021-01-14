@@ -3,6 +3,7 @@ export Trajectory,
     CircularArrayTrajectory,
     CircularVectorTrajectory,
     CircularArraySARTTrajectory,
+    CircularArraySGARTTrajectory,
     CircularArraySLARTTrajectory,
     CircularVectorSARTTrajectory,
     CircularVectorSARTSATrajectory,
@@ -73,6 +74,31 @@ CircularArraySARTTrajectory(;
     terminal = Bool => (),
 ) = merge(
     CircularArrayTrajectory(; capacity = capacity + 1, state = state, action = action),
+    CircularArrayTrajectory(; capacity = capacity, reward = reward, terminal = terminal),
+)
+
+const CircularArraySGARTTrajectory = Trajectory{
+    <:NamedTuple{
+        SGART,
+        <:Tuple{
+            <:CircularArrayBuffer,
+            <:CircularArrayBuffer,
+            <:CircularArrayBuffer,
+            <:CircularArrayBuffer,
+            <:CircularArrayBuffer,
+        },
+    },
+}
+
+CircularArraySGARTTrajectory(;
+    capacity::Int,
+    state = Int => (),
+    action = Int => (),
+    goal = Int => (),
+    reward = Float32 => (),
+    terminal = Bool => (),
+) = merge(
+    CircularArrayTrajectory(; capacity = capacity + 1, state = state, goal = goal, action = action),
     CircularArrayTrajectory(; capacity = capacity, reward = reward, terminal = terminal),
 )
 
@@ -234,6 +260,7 @@ CircularArrayPSARTTrajectory(; capacity, kwargs...) = PrioritizedTrajectory(
 function Base.length(
     t::Union{
         CircularArraySARTTrajectory,
+        CircularArraySGARTTrajectory,
         CircularVectorSARTSATrajectory,
         ElasticSARTTrajectory,
     },

@@ -76,6 +76,13 @@ function select(inds::Vector{Int}, t::CircularArraySARTTrajectory, s::BatchSampl
     ))
 end
 
+function select(inds::Vector{Int}, t::CircularArraySGARTTrajectory, s::BatchSampler{SGARTS})
+    NamedTuple{SGARTS}((
+        (convert(Array, consecutive_view(t[x], inds)) for x in SGART)...,
+        convert(Array, consecutive_view(t[:state], inds .+ 1)),
+    ))  
+end
+
 #####
 ## NStepBatchSampler
 #####

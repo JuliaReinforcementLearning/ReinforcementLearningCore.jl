@@ -1,4 +1,4 @@
-export AbstractTrajectory, SART, SARTS, SARTSA, SLART, SLARTSL, SLARTSLA
+export AbstractTrajectory, SART, SARTS, SARTSA, SGART, SGARTS, SGARTSG, SGARTSGA, SLART, SLARTSL, SLARTSLA
 
 """
     AbstractTrajectory
@@ -60,6 +60,10 @@ end
 const SART = (:state, :action, :reward, :terminal)
 const SARTS = (:state, :action, :reward, :terminal, :next_state)
 const SARTSA = (:state, :action, :reward, :terminal, :next_state, :next_action)
+const SGART = (:state, :goal, :action, :reward, :terminal)
+const SGARTS = (:state, :goal, :action, :reward, :terminal, :next_state)
+const SGARTSG = (:state, :goal, :action, :reward, :terminal, :next_state, :next_goal)
+const SGARTSGA = (:state, :goal, :action, :reward, :terminal, :next_state, :next_goal, :next_action) 
 const SLART = (:state, :legal_actions_mask, :action, :reward, :terminal, :next_state)
 const SLARTSL = (
     :state,
