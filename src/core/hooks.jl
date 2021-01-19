@@ -6,7 +6,6 @@ export AbstractHook,
     TotalRewardPerEpisode,
     TotalBatchRewardPerEpisode,
     BatchStepsPerEpisode,
-    CumulativeReward,
     TimePerStep,
     DoEveryNEpisode,
     DoEveryNStep,
@@ -207,30 +206,6 @@ function (hook::BatchStepsPerEpisode)(::PostActStage, agent, env)
             hook.step[i] = 0
         end
     end
-end
-
-#####
-# CumulativeReward
-#####
-
-"""
-    CumulativeReward(rewards::Vector{Float64} = [0.0])
-
-Store cumulative rewards since the beginning to the field of `rewards`.
-"""
-Base.@kwdef struct CumulativeReward <: AbstractHook
-    rewards::Vector{Vector{Float64}} = [[0.0]]
-end
-
-Base.getindex(h::CumulativeReward) = h.rewards
-
-function (hook::CumulativeReward)(::PostEpisodeStage, agent, env)
-    push!(hook.rewards, [0.0])
-end
-
-function (hook::CumulativeReward)(::PostActStage, agent, env)
-    r = agent isa NamedPolicy ? reward(env, nameof(agent)) : reward(env)
-    push!(hook.rewards[end], r + hook.rewards[end][end])
 end
 
 #####
