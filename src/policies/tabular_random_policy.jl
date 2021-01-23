@@ -5,7 +5,7 @@ export TabularRandomPolicy
 
 Use a `Dict` to store action distribution.
 """
-Base.@kwdef struct TabularRandomPolicy{S,T, R} <: AbstractLearner
+Base.@kwdef struct TabularRandomPolicy{S,T, R} <: AbstractPolicy
     table::Dict{S,T} = Dict{Int, Float32}()
     rng::R = Random.GLOBAL_RNG
 end
@@ -24,7 +24,7 @@ function RLBase.prob(p::TabularRandomPolicy, ::ExplicitStochastic, env::Abstract
 end
 
 function RLBase.prob(t::TabularRandomPolicy, ::RLBase.AbstractChanceStyle, env::AbstractEnv)
-    t(ActionStyle(env), env)
+    prob(t, ActionStyle(env), env)
 end
 
 function RLBase.prob(t::TabularRandomPolicy, ::FullActionSet, env::AbstractEnv)
