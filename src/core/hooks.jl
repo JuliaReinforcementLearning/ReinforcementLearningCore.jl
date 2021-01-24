@@ -296,7 +296,7 @@ end
     MultiAgentHook(player=>hook...)
 """
 struct MultiAgentHook <: AbstractHook
-    hooks::Dict{Any, Any}
+    hooks::Dict{Any,Any}
 end
 
 MultiAgentHook(player_hook_pair::Pair...) = MultiAgentHook(Dict(player_hook_pair...))
