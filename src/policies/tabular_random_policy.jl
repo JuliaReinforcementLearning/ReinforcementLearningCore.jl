@@ -41,7 +41,19 @@ function RLBase.prob(t::TabularRandomPolicy, ::MinimalActionSet, env::AbstractEn
     end
 end
 
-(p::TabularRandomPolicy)(env) = sample(p.rng, action_space(env), Weights(prob(p, env), 1.0))
+function RLBase.prob(t::TabularRandomPolicy, env::AbstractEnv, action::Int)
+    prob(t, state(env))[action]
+end
+
+function RLBase.prob(t::TabularRandomPolicy{S}, state::S, action::Int) where S
+    # assume table is already initialized
+    t.table[state][action]
+end
+
+(p::TabularRandomPolicy)(env::AbstractEnv) = sample(p.rng, action_space(env), Weights(prob(p, env), 1.0))
+
+"!!! Assumeing table is already initialized"
+(p::TabularRandomPolicy{S})(state::S) where S = sample(p.rng, Weights(p.table[state], 1.0))
 
 """
     update!(p::TabularRandomPolicy, state => value)
