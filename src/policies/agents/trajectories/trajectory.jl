@@ -252,3 +252,5 @@ function Base.length(
     x = t[:terminal]
     size(x, ndims(x))
 end
+
+Base.length(t::VectorSARTTrajectory) = length(t[:terminal])
