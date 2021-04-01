@@ -51,7 +51,7 @@
     @testset "CircularArraySLARTTrajectory" begin
         t = CircularArraySLARTTrajectory(
             capacity = 3,
-            state = Matrix{Float32} => (2,2),
+            state = Vector{Int} => (4,),
             legal_actions_mask = Vector{Bool} => (4, ),
         )
         
@@ -61,7 +61,7 @@
         @test length(t) == 0
         push!(t; state = ones(Int, 4), action = 1, legal_actions_mask = trues(4))
         @test length(t) == 0
-        push!(t; reward = 1.0f0, terminal = false,)
+        push!(t; reward = 1.0f0, terminal = false)
         @test length(t) == 1
     end
 
