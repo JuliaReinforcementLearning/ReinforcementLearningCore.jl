@@ -54,7 +54,7 @@
             state = Matrix{Float32} => (2,2),
             legal_actions_mask = Vector{Bool} => (4, ),
         )
-        println("TESTTEST")
+        
         # test instance type is same as type
         @test isa(t, CircularArraySLARTTrajectory)
     end
