@@ -1,5 +1,7 @@
 # ReinforcementLearningCore
 
+⚠️ This package is moved into [ReinforcementLearning.jl](https://github.com/JuliaReinforcementLearning/ReinforcementLearning.jl) (2021-05-06)
+
 [![CI](https://github.com/JuliaReinforcementLearning/ReinforcementLearningCore.jl/workflows/CI/badge.svg)](https://github.com/JuliaReinforcementLearning/ReinforcementLearningCore.jl/actions?query=workflow%3ACI)
 [![CodeCoverage](https://codecov.io/gh/JuliaReinforcementLearning/ReinforcementLearningCore.jl/branch/master/graph/badge.svg)](https://codecov.io/gh/JuliaReinforcementLearning/ReinforcementLearningCore.jl)
 
